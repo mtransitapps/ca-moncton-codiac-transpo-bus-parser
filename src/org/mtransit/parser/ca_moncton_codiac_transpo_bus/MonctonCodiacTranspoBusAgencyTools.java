@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -86,8 +87,10 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern DIGITS = Pattern.compile("[\\d]+");
 
 	private static final long RID_ENDS_WITH_B = 2000l;
+	private static final long RID_ENDS_WITH_S = 19000l;
 
-	private static final String B = "B";
+	private static final String B = "b";
+	private static final String S = "s";
 
 	private static final long RID_MM = 99000l;
 
@@ -95,17 +98,20 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
-		if (Utils.isDigitsOnly(gRoute.getRouteShortName())) {
-			return Long.parseLong(gRoute.getRouteShortName()); // use route short name as route ID
+		String rsn = gRoute.getRouteShortName().toLowerCase(Locale.ENGLISH);
+		if (Utils.isDigitsOnly(rsn)) {
+			return Long.parseLong(rsn); // use route short name as route ID
 		}
-		if (MM_RID.equalsIgnoreCase(gRoute.getRouteShortName())) {
+		if (MM_RID.equalsIgnoreCase(rsn)) {
 			return RID_MM;
 		}
-		Matcher matcher = DIGITS.matcher(gRoute.getRouteShortName());
+		Matcher matcher = DIGITS.matcher(rsn);
 		matcher.find();
 		long id = Long.parseLong(matcher.group());
-		if (gRoute.getRouteShortName().endsWith(B)) {
+		if (rsn.endsWith(B)) {
 			return RID_ENDS_WITH_B + id;
+		} else if (rsn.endsWith(S)) {
+			return RID_ENDS_WITH_S + id;
 		}
 		System.out.printf("\nUnexpected route ID for %s!\n", gRoute);
 		System.exit(-1);
@@ -122,6 +128,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return AGENCY_COLOR;
 	}
 
+	private static final String RID_50S = "50s";
+	private static final String RID_61B = "61B";
 	private static final String RID_64B = "64B";
 
 	private static final String COLOR_52B1B6 = "52B1B6";
@@ -148,8 +156,9 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
-			if (Utils.isDigitsOnly(gRoute.getRouteShortName())) {
-				int rsn = Integer.parseInt(gRoute.getRouteShortName());
+			String routeShortName = gRoute.getRouteShortName();
+			if (Utils.isDigitsOnly(routeShortName)) {
+				int rsn = Integer.parseInt(routeShortName);
 				switch (rsn) {
 				// @formatter:off
 				case 40: return null; // agency color
@@ -175,10 +184,14 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				// @formatter:on
 				}
 			}
-			if (MM_RID.equalsIgnoreCase(gRoute.getRouteShortName())) {
+			if (MM_RID.equalsIgnoreCase(routeShortName)) {
 				return null; // agency color
 			}
-			if (RID_64B.equalsIgnoreCase(gRoute.getRouteShortName())) {
+			if (RID_50S.equalsIgnoreCase(routeShortName)) {
+				return COLOR_FF0000;
+			} else if (RID_61B.equalsIgnoreCase(routeShortName)) {
+				return COLOR_FFA77F;
+			} else if (RID_64B.equalsIgnoreCase(routeShortName)) {
 				return COLOR_52B1B6; // COLOR_73FFDF too light
 			}
 			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
@@ -360,9 +373,9 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BOURQUE_CHARTERSVILLE, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810870", "6810935" })) //
+						Arrays.asList(new String[] { "6810200", "6810978", "6810935" })) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810935", "6810627", "6810200" })) //
+						Arrays.asList(new String[] { "6810935", "6810982", "6810200" })) //
 				.compileBothTripSort());
 		map2.put(95l, new RouteTripSpec(95l, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
