@@ -48,11 +48,11 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating Codiac Transpo Transit bus data...");
+		System.out.printf("\nGenerating Codiac Transpo bus data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this);
 		super.start(args);
-		System.out.printf("\nGenerating Codiac Transpo Transit bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		System.out.printf("\nGenerating Codiac Transpo bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -88,9 +88,13 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	private static final long RID_ENDS_WITH_B = 2000l;
 	private static final long RID_ENDS_WITH_S = 19000l;
+	private static final long RID_ENDS_WITH_LT = 1220000l;
+	private static final long RID_ENDS_WITH_LTS = 122019000l;
 
 	private static final String B = "b";
 	private static final String S = "s";
+	private static final String LT = "lt";
+	private static final String LTS = "lts";
 
 	private static final long RID_MM = 99000l;
 
@@ -106,12 +110,17 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			return RID_MM;
 		}
 		Matcher matcher = DIGITS.matcher(rsn);
-		matcher.find();
-		long id = Long.parseLong(matcher.group());
-		if (rsn.endsWith(B)) {
-			return RID_ENDS_WITH_B + id;
-		} else if (rsn.endsWith(S)) {
-			return RID_ENDS_WITH_S + id;
+		if (matcher.find()) {
+			long id = Long.parseLong(matcher.group());
+			if (rsn.endsWith(LTS)) {
+				return RID_ENDS_WITH_LTS + id;
+			} else if (rsn.endsWith(LT)) {
+				return RID_ENDS_WITH_LT + id;
+			} else if (rsn.endsWith(B)) {
+				return RID_ENDS_WITH_B + id;
+			} else if (rsn.endsWith(S)) {
+				return RID_ENDS_WITH_S + id;
+			}
 		}
 		System.out.printf("\nUnexpected route ID for %s!\n", gRoute);
 		System.exit(-1);
@@ -127,10 +136,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	public String getAgencyColor() {
 		return AGENCY_COLOR;
 	}
-
-	private static final String RID_50S = "50s";
-	private static final String RID_61B = "61B";
-	private static final String RID_64B = "64B";
 
 	private static final String COLOR_52B1B6 = "52B1B6";
 	private static final String COLOR_FF0000 = "FF0000";
@@ -156,42 +161,43 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
-			String routeShortName = gRoute.getRouteShortName();
-			if (Utils.isDigitsOnly(routeShortName)) {
-				int rsn = Integer.parseInt(routeShortName);
-				switch (rsn) {
-				// @formatter:off
-				case 40: return null; // agency color
-				case 50: return COLOR_FF0000;
-				case 51: return COLOR_33BA16; // COLOR_55FF00 to light
-				case 52: return COLOR_0070FF;
-				case 60: return COLOR_EB8323;
-				case 61: return COLOR_FFA77F;
-				case 62: return COLOR_DD5344;
-				case 63: return COLOR_8F4827;
-				case 64: return COLOR_295185;
-				case 65: return COLOR_ADAB28;
-				case 66: return COLOR_8F226B;
-				case 67: return COLOR_626B21;
-				case 68: return COLOR_AB8055;
-				case 70: return COLOR_7B473F;
-				case 71: return COLOR_A428A6;
-				case 80: return COLOR_28A855;
-				case 81: return COLOR_CE22A3;
-				case 93: return COLOR_428227;
-				case 94: return COLOR_8585E9;
-				case 95: return COLOR_739E97;
-				// @formatter:on
-				}
+			long routeId = getRouteId(gRoute);
+			switch ((int) routeId) {
+			// @formatter:off
+			case 40: return null; // agency color
+			case 50: return COLOR_FF0000;
+			case 51: return COLOR_33BA16; // COLOR_55FF00 to light
+			case 52: return COLOR_0070FF;
+			case 60: return COLOR_EB8323;
+			case 61: return COLOR_FFA77F;
+			case 62: return COLOR_DD5344;
+			case 63: return COLOR_8F4827;
+			case 64: return COLOR_295185;
+			case 65: return COLOR_ADAB28;
+			case 66: return COLOR_8F226B;
+			case 67: return COLOR_626B21;
+			case 68: return COLOR_AB8055;
+			case 70: return COLOR_7B473F;
+			case 71: return COLOR_A428A6;
+			case 80: return COLOR_28A855;
+			case 81: return COLOR_CE22A3;
+			case 93: return COLOR_428227;
+			case 94: return COLOR_8585E9;
+			case 95: return COLOR_739E97;
+			// @formatter:on
 			}
-			if (MM_RID.equalsIgnoreCase(routeShortName)) {
+			if (RID_MM == routeId) {
 				return null; // agency color
 			}
-			if (RID_50S.equalsIgnoreCase(routeShortName)) {
+			if (50l + RID_ENDS_WITH_S == routeId) {
 				return COLOR_FF0000;
-			} else if (RID_61B.equalsIgnoreCase(routeShortName)) {
+			} else if (60l + RID_ENDS_WITH_LT == routeId) {
+				return COLOR_EB8323;
+			} else if (60l + RID_ENDS_WITH_LTS == routeId) {
+				return COLOR_EB8323;
+			} else if (61l + RID_ENDS_WITH_B == routeId) {
 				return COLOR_FFA77F;
-			} else if (RID_64B.equalsIgnoreCase(routeShortName)) {
+			} else if (64l + RID_ENDS_WITH_B == routeId) {
 				return COLOR_52B1B6; // COLOR_73FFDF too light
 			}
 			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
@@ -202,6 +208,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	private static final String PLAZA_BLVD = "Plz Blvd";
+	private static final String _140_MILLENNIUM = "140 Millennium";
 	private static final String _1111_MAIN = "1111 Main";
 	private static final String ELMWOOD = "Elmwood";
 	private static final String CHAMPLAIN_PL = "Champlain Pl";
@@ -220,6 +227,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String RIVERVIEW = "Riverview";
 	private static final String ADÉLARD_SAVOIE_DIEPPE_BLVD = "Adélard-Savoie / Dieppe Blvd";
 	private static final String BOURQUE_CHARTERSVILLE = "Bourque / Chartersville";
+	private static final String SALISBURY_RD = "Salisbury Rd";
 	private static final String FOX_CRK_AMIRAULT = "Fox Crk / Amirault";
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
@@ -256,6 +264,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						Arrays.asList(new String[] { "6810277", "6810770", "6810286", "6810234" })) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { "6810234", "6810763", "6810277" })) //
+				.compileBothTripSort());
+		map2.put(60l + RID_ENDS_WITH_LT, new RouteTripSpec(60l + RID_ENDS_WITH_LT, // 60LT
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, SALISBURY_RD) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "6810483", "6810770", "6810286", "6810234" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "6810234", "6810763", "6810483" })) //
+				.compileBothTripSort());
+		map2.put(60l + RID_ENDS_WITH_LTS, new RouteTripSpec(60l + RID_ENDS_WITH_LTS, // 60LTS
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _140_MILLENNIUM, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, SALISBURY_RD) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "6810483", "6810770", "6810286" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "6810234", "6810483" })) //
 				.compileBothTripSort());
 		map2.put(61l, new RouteTripSpec(61l, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
@@ -439,10 +463,18 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern AT = Pattern.compile("((^|\\W){1}(at)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String AT_REPLACEMENT = "$2/$4";
 
+	private static final Pattern UNIVERSITY_ENCODING = Pattern.compile("((^|\\W){1}(universit�)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String UNIVERSITY_ENCODING_REPLACEMENT = "$2University$4";
+
+	private static final Pattern ADELARD_ENCODING = Pattern.compile("((^|\\W){1}(ad�lard)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String ADELARD_ENCODING_REPLACEMENT = "$2Adelard$4";
+
 	@Override
 	public String cleanStopName(String gStopName) {
 		gStopName = AND.matcher(gStopName).replaceAll(AND_REPLACEMENT);
 		gStopName = AT.matcher(gStopName).replaceAll(AT_REPLACEMENT);
+		gStopName = UNIVERSITY_ENCODING.matcher(gStopName).replaceAll(UNIVERSITY_ENCODING_REPLACEMENT);
+		gStopName = ADELARD_ENCODING.matcher(gStopName).replaceAll(ADELARD_ENCODING_REPLACEMENT);
 		gStopName = CleanUtils.cleanSlashes(gStopName);
 		gStopName = CleanUtils.removePoints(gStopName);
 		gStopName = CleanUtils.cleanNumbers(gStopName);
