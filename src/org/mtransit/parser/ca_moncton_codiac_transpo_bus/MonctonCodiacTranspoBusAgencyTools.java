@@ -87,11 +87,15 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern DIGITS = Pattern.compile("[\\d]+");
 
 	private static final long RID_ENDS_WITH_B = 2000l;
+	private static final long RID_ENDS_WITH_C1 = 103000l;
+	private static final long RID_ENDS_WITH_C2 = 203000l;
 	private static final long RID_ENDS_WITH_S = 19000l;
 	private static final long RID_ENDS_WITH_LT = 1220000l;
 	private static final long RID_ENDS_WITH_LTS = 122019000l;
 
 	private static final String B = "b";
+	private static final String C1 = "c1";
+	private static final String C2 = "c2";
 	private static final String S = "s";
 	private static final String LT = "lt";
 	private static final String LTS = "lts";
@@ -120,12 +124,21 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_B + id;
 			} else if (rsn.endsWith(S)) {
 				return RID_ENDS_WITH_S + id;
+			} else if (rsn.endsWith(C1)) {
+				return RID_ENDS_WITH_C1 + id;
+			} else if (rsn.endsWith(C2)) {
+				return RID_ENDS_WITH_C2 + id;
 			}
 		}
 		System.out.printf("\nUnexpected route ID for %s!\n", gRoute);
 		System.exit(-1);
 		return -1l;
 
+	}
+
+	@Override
+	public String getRouteShortName(GRoute gRoute) {
+		return gRoute.getRouteShortName().toUpperCase(Locale.ENGLISH);
 	}
 
 	private static final String AGENCY_COLOR_GREEN = "005238"; // GREEN (from PDF)
@@ -184,6 +197,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			case 93: return COLOR_428227;
 			case 94: return COLOR_8585E9;
 			case 95: return COLOR_739E97;
+			case 939495: return null; // agency color
 			// @formatter:on
 			}
 			if (RID_MM == routeId) {
@@ -199,6 +213,12 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return COLOR_FFA77F;
 			} else if (64l + RID_ENDS_WITH_B == routeId) {
 				return COLOR_52B1B6; // COLOR_73FFDF too light
+			} else if (8081 + RID_ENDS_WITH_C1 == routeId) {
+				return null; // agency color
+			} else if (8081 + RID_ENDS_WITH_C2 == routeId) {
+				return null; // agency color
+			} else if (81l + RID_ENDS_WITH_S == routeId) {
+				return COLOR_CE22A3;
 			}
 			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
 			System.exit(-1);
@@ -234,6 +254,14 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<Long, RouteTripSpec>();
 		map2.put(50l, new RouteTripSpec(50l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { "6810785", "6810205", "6810200" })) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { "6810200", "6810202", "6810785" })) //
+				.compileBothTripSort());
+		map2.put(50l + RID_ENDS_WITH_S, new RouteTripSpec(50l + RID_ENDS_WITH_S, // 50 S
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
@@ -288,6 +316,13 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						Arrays.asList(new String[] { "6810200", "6810303", "6810434" })) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { "6810434", "6810781", "6810316", "6810200" })) //
+		map2.put(61l + RID_ENDS_WITH_B, new RouteTripSpec(61l + RID_ENDS_WITH_B, // 61B
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "6810200", "6810422", "6810427" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "6810427", "6810962", "6810200" })) //
 				.compileBothTripSort());
 		map2.put(62l, new RouteTripSpec(62l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
@@ -377,6 +412,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { "6810413", "6810544", "6810552" })) //
 				.compileBothTripSort());
+		map2.put(8081l + RID_ENDS_WITH_C1, new RouteTripSpec(8081l + RID_ENDS_WITH_C1, // 80-81 c1
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, BRIDGEDALE) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "6810552", "6810561", "6810413" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "6810413", "6810544", "6810552" })) //
+				.compileBothTripSort());
+		map2.put(8081l + 203000l, new RouteTripSpec(8081l + 203000l, // 80-81 c2
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "6810589", "6810568", "6810413" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "6810413", "6810552", "6810589" })) //
+				.compileBothTripSort());
 		map2.put(81l, new RouteTripSpec(81l, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
@@ -385,6 +436,14 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { "6810413", "6810568", "6810588" })) //
 				.compileBothTripSort());
+		map2.put(81l + RID_ENDS_WITH_S, new RouteTripSpec(81l + RID_ENDS_WITH_S, // 81S
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "6810589", "6810568", "6810413" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "6810413", "6810568", "6810589" })) //
+				.compileBothTripSort());
 		map2.put(93l, new RouteTripSpec(93l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, ADÉLARD_SAVOIE_DIEPPE_BLVD, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
@@ -392,6 +451,14 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						Arrays.asList(new String[] { "6810200", "6810613", "6810641" })) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { "6810641", "6810880", "6810200" })) //
+				.compileBothTripSort());
+		map2.put(939495l, new RouteTripSpec(939495l, //
+				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, FOX_CRK_AMIRAULT) //
+				.addTripSort(MDirectionType.NORTH.intValue(), //
+						Arrays.asList(new String[] { "6810672", "6810982", "6810200" })) //
+				.addTripSort(MDirectionType.SOUTH.intValue(), //
+						Arrays.asList(new String[] { "6810200", "6810664", "6810672" })) //
 				.compileBothTripSort());
 		map2.put(94l, new RouteTripSpec(94l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BOURQUE_CHARTERSVILLE, //
