@@ -110,7 +110,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
-		String rsn = gRoute.getRouteShortName().toLowerCase(Locale.ENGLISH);
+		String rsn = gRoute.getRouteId().toLowerCase(Locale.ENGLISH);
 		if (Utils.isDigitsOnly(rsn)) {
 			return Long.parseLong(rsn); // use route short name as route ID
 		}
@@ -144,7 +144,14 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
-		return gRoute.getRouteShortName().toUpperCase(Locale.ENGLISH);
+		return gRoute.getRouteId().toUpperCase(Locale.ENGLISH);
+	}
+
+	@Override
+	public boolean mergeRouteLongName(MRoute mRoute, MRoute mRouteToMerge) {
+		System.out.printf("\nUnexpected routes to merge %s & %s!\n", mRoute, mRouteToMerge);
+		System.exit(-1);
+		return false;
 	}
 
 	private static final String AGENCY_COLOR_GREEN = "005238"; // GREEN (from PDF)
@@ -523,6 +530,13 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		}
 		int directionId = gTrip.getDirectionId() == null ? 0 : gTrip.getDirectionId();
 		mTrip.setHeadsignString(cleanTripHeadsign(tripHeadsign), directionId);
+	}
+
+	@Override
+	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+		System.out.printf("\nUnexpected trips to merge %s & %s!\n", mTrip, mTripToMerge);
+		System.exit(-1);
+		return false;
 	}
 
 	@Override
