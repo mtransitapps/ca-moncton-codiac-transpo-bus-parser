@@ -376,7 +376,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, KILLAM) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810406", "6810906", "6810785" })) //
+						Arrays.asList(new String[] { "6810406", "6810408", "6810906", "6810785" })) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { "6810785", "6810809", "6810401", "6810406" })) //
 				.compileBothTripSort());
