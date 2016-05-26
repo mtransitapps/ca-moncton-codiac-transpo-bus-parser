@@ -539,8 +539,15 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return false;
 	}
 
+	private static final Pattern TOWARDS = Pattern.compile("((^|\\W){1}(towards)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
+		Matcher matcherTOWARDS = TOWARDS.matcher(tripHeadsign);
+		if (matcherTOWARDS.find()) {
+			String gTripHeadsignAfterTOWARDS = tripHeadsign.substring(matcherTOWARDS.end());
+			tripHeadsign = gTripHeadsignAfterTOWARDS;
+		}
 		tripHeadsign = CleanUtils.removePoints(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
