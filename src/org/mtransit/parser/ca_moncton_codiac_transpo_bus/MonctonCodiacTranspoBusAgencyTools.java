@@ -210,6 +210,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			case 93: return COLOR_428227;
 			case 94: return COLOR_8585E9;
 			case 95: return COLOR_739E97;
+			case 512100: return COLOR_33BA16; // COLOR_55FF00 to light
 			case 939495: return null; // agency color
 			// @formatter:on
 			}
@@ -292,6 +293,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { "6810234", "6810241", "6810785" })) //
 				.compileBothTripSort());
+		map2.put(512100l, new RouteTripSpec(512100l, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, "Trinity Dr") // PLAZA_BLVD
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810786", // Trinity Drive
+								"6810225", //
+								"6810234" // 1111 Main
+						})) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810234", // 1111 Main
+								"6810241", //
+								"6810786", // Trinity Drive
+						})) //
+				.compileBothTripSort());
 		map2.put(52l, new RouteTripSpec(52l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN) //
@@ -312,9 +329,18 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, SALISBURY_RD) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810483", "6810770", "6810286", "6810234" })) //
+						Arrays.asList(new String[] { //
+						"6810483", // Atlantic Baptist
+								"6810770", //
+								// "6810286", //
+								"6810234" // 1111 Main
+						})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810234", "6810763", "6810483" })) //
+						Arrays.asList(new String[] { //
+						"6810234", // 1111 Main
+								"6810471", //
+								"6810483" // Atlantic Baptist
+						})) //
 				.compileBothTripSort());
 		map2.put(60l + RID_ENDS_WITH_LTS, new RouteTripSpec(60l + RID_ENDS_WITH_LTS, // 60LTS
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _140_MILLENNIUM, //
@@ -345,13 +371,17 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CASINO) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810324", "6810330", //
+						"6810324", // Casino Dr (Casino)
+								"6810330", //
+								"6810808", // 1576 Mountain
 								"6811014", //
-								"6810785" //
+								"6810785" // Plaza Blvd (Walmart)
 						})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810785", "6810916", "6810324" //
+						"6810785", // Plaza Blvd (Walmart)
+								"6810916", //
+								"6810324" // Casino Dr (Casino)
 						})) //
 				.compileBothTripSort());
 		map2.put(63l, new RouteTripSpec(63l, //
@@ -372,7 +402,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.compileBothTripSort());
 		map2.put(64l + RID_ENDS_WITH_B, new RouteTripSpec(64l + RID_ENDS_WITH_B, // 64B
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HOSPITALS, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN) //
+				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN) // HIGHFIELD_SQ
 				.addTripSort(MDirectionType.NORTH.intValue(), //
 						Arrays.asList(new String[] { //
 						"6810234", "6810747", "6810401" //
@@ -386,9 +416,20 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, KILLAM) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810406", "6810408", "6810906", "6810785" })) //
+						Arrays.asList(new String[] { //
+						"6810406", // 25 Killam (Asian Garden)
+								"6810408", // 121 Killam (Chubby's Variety)
+								"6810906", //
+								"6810786", // Trinity Drive
+								"6811029", // South Plaza Sud
+						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810785", "6810809", "6810401", "6810406" })) //
+						Arrays.asList(new String[] { //
+						"6811029", // South Plaza Sud
+								"6810809", //
+								"6810401", //
+								"6810406" // 25 Killam (Asian Garden)
+						})) //
 				.compileBothTripSort());
 		map2.put(66l, new RouteTripSpec(66l, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CALEDONIA, //
@@ -419,13 +460,15 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810785", //
+						"6811029", // South Plaza Sud
 								"6811015", //
-								"6810512" //
+								"6810512" // Crandall University
 						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810512", "6810520", "6810785" //
+						"6810512", // Crandall University
+								"6810520", //
+								"6810785" // Plaza Blvd (Walmart)
 						})) //
 				.compileBothTripSort());
 		map2.put(71l, new RouteTripSpec(71l, //
@@ -433,13 +476,16 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, COLISEUM) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810841", "6810537", //
-								"6811014", //
-								"6810785" //
+						"6810841", // Coliseum Entrance
+								"6810537", //
+								"6810808", // 1576 Mountain
+								"6811029" // South Plaza Sud
 						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810785", "6810526", "6810841" //
+						"6810785", // Plaza Blvd (Walmart)"
+								"6810526", //
+								"6810841" // Coliseum Entrance
 						})) //
 				.compileBothTripSort());
 		map2.put(80l, new RouteTripSpec(80l, //
