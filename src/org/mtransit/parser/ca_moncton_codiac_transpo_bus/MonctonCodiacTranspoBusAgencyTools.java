@@ -86,21 +86,21 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern DIGITS = Pattern.compile("[\\d]+");
 
-	private static final long RID_ENDS_WITH_B = 2000l;
-
-	private static final long RID_ENDS_WITH_C = 3000l;
-	private static final long RID_ENDS_WITH_C1 = 103000l;
-	private static final long RID_ENDS_WITH_C2 = 203000l;
-	private static final long RID_ENDS_WITH_S = 19000l;
-	private static final long RID_ENDS_WITH_LT = 1220000l;
-	private static final long RID_ENDS_WITH_LTS = 122019000l;
+	private static final long RID_ENDS_WITH_B = 2L * 10000L;
+	private static final long RID_ENDS_WITH_C = 3L * 10000L;
+	private static final long RID_ENDS_WITH_S = 19L * 10000L;
+	//
+	private static final long RID_ENDS_WITH_C1 = 27L * 10000L;
+	private static final long RID_ENDS_WITH_C2 = 28L * 10000L;
+	private static final long RID_ENDS_WITH_LT = 29L * 10000L;
+	private static final long RID_ENDS_WITH_LTS = 30L * 10000L;
 
 	private static final String B = "b";
-
 	private static final String C = "c";
+	private static final String S = "s";
+	//
 	private static final String C1 = "c1";
 	private static final String C2 = "c2";
-	private static final String S = "s";
 	private static final String LT = "lt";
 	private static final String LTS = "lts";
 
@@ -325,6 +325,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { "6810234", "6810763", "6810277" })) //
 				.compileBothTripSort());
+		map2.put(6067L + RID_ENDS_WITH_C, new RouteTripSpec(6067L + RID_ENDS_WITH_C, // 6067C
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BESSBOROUGH) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810277", // 1000 St George (Bessborough)
+								"6810771", //
+								"6810234" // 1111 Main
+						})) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810234", // 1111 Main
+								"6810763", //
+								"6810277" // 1000 St George (Bessborough)
+						})) //
+				.compileBothTripSort());
 		map2.put(60l + RID_ENDS_WITH_LT, new RouteTripSpec(60l + RID_ENDS_WITH_LT, // 60LT
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, SALISBURY_RD) //
@@ -504,7 +520,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { "6810413", "6810544", "6810552" })) //
 				.compileBothTripSort());
-		map2.put(8081l + 203000l, new RouteTripSpec(8081l + 203000l, // 80-81 c2
+		map2.put(8081l + RID_ENDS_WITH_C2, new RouteTripSpec(8081l + RID_ENDS_WITH_C2, // 80-81 c2
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
@@ -622,12 +638,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
-	private static final Pattern AND = Pattern.compile("((^|\\W){1}(and)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String AND_REPLACEMENT = "$2&$4";
-
-	private static final Pattern AT = Pattern.compile("((^|\\W){1}(at)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String AT_REPLACEMENT = "$2/$4";
-
 	private static final Pattern UNIVERSITY_ENCODING = Pattern.compile("((^|\\W){1}(universit�)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String UNIVERSITY_ENCODING_REPLACEMENT = "$2University$4";
 
@@ -636,8 +646,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String cleanStopName(String gStopName) {
-		gStopName = AND.matcher(gStopName).replaceAll(AND_REPLACEMENT);
-		gStopName = AT.matcher(gStopName).replaceAll(AT_REPLACEMENT);
+		gStopName = CleanUtils.CLEAN_AND.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
+		gStopName = CleanUtils.CLEAN_AT.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		gStopName = UNIVERSITY_ENCODING.matcher(gStopName).replaceAll(UNIVERSITY_ENCODING_REPLACEMENT);
 		gStopName = ADELARD_ENCODING.matcher(gStopName).replaceAll(ADELARD_ENCODING_REPLACEMENT);
 		gStopName = CleanUtils.cleanSlashes(gStopName);
