@@ -273,9 +273,20 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810785", "6810205", "6810200" })) //
+						Arrays.asList(new String[] { //
+						"6811029", // South Plaza Sud
+								"6811029", // South Plaza Sud
+								"6810200", // CF Champlain
+								"6810200", // CF Champlain
+						})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810202", "6810785" })) //
+						Arrays.asList(new String[] { //
+						"6810200", // CF Champlain
+								"6810793", //
+								"6810202", // ++
+								"6811031", //
+								"6811029", // South Plaza Sud
+						})) //
 				.compileBothTripSort());
 		map2.put(50l + RID_ENDS_WITH_S, new RouteTripSpec(50l + RID_ENDS_WITH_S, // 50 S
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
@@ -370,9 +381,18 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810303", "6810434" })) //
+						Arrays.asList(new String[] { //
+						"6810200", // CF Champlain
+								"6810303", // ++
+								"6810309", // Hennessey Petro-Canada
+						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810434", "6810781", "6810316", "6810200" })) //
+						Arrays.asList(new String[] { //
+						"6810309", // Hennessey Petro-Canada
+								"6810781", // ++
+								"6810316", // ++
+								"6810200", // CF Champlain
+						})) //
 				.compileBothTripSort());
 		map2.put(61l + RID_ENDS_WITH_B, new RouteTripSpec(61l + RID_ENDS_WITH_B, // 61B
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
@@ -436,12 +456,11 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						"6810406", // 25 Killam (Asian Garden)
 								"6810408", // 121 Killam (Chubby's Variety)
 								"6810906", //
-								"6810786", // Trinity Drive
-								"6811029", // South Plaza Sud
+								"6810785", // Plaza Blvd (Walmart)
 						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { //
-						"6811029", // South Plaza Sud
+						"6810785", // Plaza Blvd (Walmart)
 								"6810809", //
 								"6810401", //
 								"6810406" // 25 Killam (Asian Garden)
