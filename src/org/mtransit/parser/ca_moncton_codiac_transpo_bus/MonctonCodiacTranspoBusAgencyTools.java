@@ -139,7 +139,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		System.out.printf("\nUnexpected route ID for %s!\n", gRoute);
 		System.exit(-1);
 		return -1l;
-
 	}
 
 	@Override
@@ -359,7 +358,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						Arrays.asList(new String[] { //
 						"6810483", // Atlantic Baptist
 								"6810770", //
-								// "6810286", //
 								"6810234" // 1111 Main
 						})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
@@ -383,13 +381,13 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.NORTH.intValue(), //
 						Arrays.asList(new String[] { //
 						"6810200", // CF Champlain
-								"6810303", // ++
+								"6810298", // ++
 								"6810309", // Hennessey Petro-Canada
 						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { //
 						"6810309", // Hennessey Petro-Canada
-								"6810781", // ++
+								"6810781", // ++ 54 Elmwood Dr
 								"6810316", // ++
 								"6810200", // CF Champlain
 						})) //
@@ -398,9 +396,17 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810422", "6810427" })) //
+						Arrays.asList(new String[] { //
+						"6810200", // CF Champlain
+								"6810422", // ++
+								"6810954", // 603 Elmwood
+						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810427", "6810962", "6810200" })) //
+						Arrays.asList(new String[] { //
+						"6810954", // 603 Elmwood
+								"6810962", // ++
+								"6810200", // CF Champlain
+						})) //
 				.compileBothTripSort());
 		map2.put(62l, new RouteTripSpec(62l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
@@ -470,9 +476,17 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CALEDONIA, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810419", "6810883" })) //
+						Arrays.asList(new String[] { //
+						"6810413", // 1110 Main
+								"6810419", // ++
+								"6810883", //
+						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810883", "6810918", "6810413" })) //
+						Arrays.asList(new String[] { //
+						"6810883", //
+								"6811032", // ++
+								"6810413", // 1110 Main
+						})) //
 				.compileBothTripSort());
 		map2.put(67l, new RouteTripSpec(67l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
@@ -567,9 +581,17 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, ADÉLARD_SAVOIE_DIEPPE_BLVD, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810613", "6810641" })) //
+						Arrays.asList(new String[] { //
+						"6810200", // CF Champlain
+								"6810613", //
+								"6810986", // Dieppe Blvd (Arc. Quality Inn)
+						})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810641", "6810880", "6810200" })) //
+						Arrays.asList(new String[] { //
+						"6810986", // Dieppe Blvd (Arc. Quality Inn)
+								"6810880", //
+								"6810200", // CF Champlain
+						})) //
 				.compileBothTripSort());
 		map2.put(939495l, new RouteTripSpec(939495l, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
@@ -601,7 +623,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public int compareEarly(long routeId, List<MTripStop> list1, List<MTripStop> list2, MTripStop ts1, MTripStop ts2, GStop ts1GStop, GStop ts2GStop) {
 		if (ALL_ROUTE_TRIPS2.containsKey(routeId)) {
-			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
+			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop, this);
 		}
 		return super.compareEarly(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
 	}
@@ -617,7 +639,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public Pair<Long[], Integer[]> splitTripStop(MRoute mRoute, GTrip gTrip, GTripStop gTripStop, ArrayList<MTrip> splitTrips, GSpec routeGTFS) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
-			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()));
+			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()), this);
 		}
 		return super.splitTripStop(mRoute, gTrip, gTripStop, splitTrips, routeGTFS);
 	}
