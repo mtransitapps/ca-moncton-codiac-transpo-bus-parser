@@ -80,15 +80,21 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
+	public boolean excludeRoute(GRoute gRoute) {
+		return super.excludeRoute(gRoute);
+	}
+
+	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_BUS;
 	}
 
 	private static final Pattern DIGITS = Pattern.compile("[\\d]+");
 
-	private static final long RID_ENDS_WITH_B = 2L * 10000L;
-	private static final long RID_ENDS_WITH_C = 3L * 10000L;
-	private static final long RID_ENDS_WITH_S = 19L * 10000L;
+	private static final long RID_ENDS_WITH_B = 20_000L;
+	private static final long RID_ENDS_WITH_C = 30_000L;
+	private static final long RID_ENDS_WITH_P = 160_000L;
+	private static final long RID_ENDS_WITH_S = 190_000L;
 	//
 	private static final long RID_ENDS_WITH_C1 = 27L * 10000L;
 	private static final long RID_ENDS_WITH_C2 = 28L * 10000L;
@@ -97,6 +103,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String B = "b";
 	private static final String C = "c";
+	private static final String P = "p";
 	private static final String S = "s";
 	//
 	private static final String C1 = "c1";
@@ -128,6 +135,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_B + id;
 			} else if (rsn.endsWith(C)) {
 				return RID_ENDS_WITH_C + id;
+			} else if (rsn.endsWith(P)) {
+				return RID_ENDS_WITH_P + id;
 			} else if (rsn.endsWith(S)) {
 				return RID_ENDS_WITH_S + id;
 			} else if (rsn.endsWith(C1)) {
@@ -234,6 +243,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return null; // agency color
 			} else if (81l + RID_ENDS_WITH_S == routeId) {
 				return COLOR_CE22A3;
+			} else if (93L + RID_ENDS_WITH_P == routeId) {
+				return COLOR_428227;
 			}
 			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
 			System.exit(-1);
