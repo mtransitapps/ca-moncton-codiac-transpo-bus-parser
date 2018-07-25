@@ -96,10 +96,10 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final long RID_ENDS_WITH_P = 160_000L;
 	private static final long RID_ENDS_WITH_S = 190_000L;
 	//
-	private static final long RID_ENDS_WITH_C1 = 27L * 10000L;
-	private static final long RID_ENDS_WITH_C2 = 28L * 10000L;
-	private static final long RID_ENDS_WITH_LT = 29L * 10000L;
-	private static final long RID_ENDS_WITH_LTS = 30L * 10000L;
+	private static final long RID_ENDS_WITH_C1 = 27L * 10_000L;
+	private static final long RID_ENDS_WITH_C2 = 28L * 10_000L;
+	private static final long RID_ENDS_WITH_LT = 29L * 10_000L;
+	private static final long RID_ENDS_WITH_LTS = 30L * 10_000L;
 
 	private static final String B = "b";
 	private static final String C = "c";
@@ -111,7 +111,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String LT = "lt";
 	private static final String LTS = "lts";
 
-	private static final long RID_MM = 99000l;
+	private static final long RID_MM = 99_000L;
 
 	private static final String MM_RID = "MM";
 
@@ -171,26 +171,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return AGENCY_COLOR;
 	}
 
-	private static final String COLOR_52B1B6 = "52B1B6";
-	private static final String COLOR_FF0000 = "FF0000";
-	private static final String COLOR_33BA16 = "33BA16";
-	private static final String COLOR_0070FF = "0070FF";
-	private static final String COLOR_EB8323 = "EB8323";
-	private static final String COLOR_FFA77F = "FFA77F";
-	private static final String COLOR_DD5344 = "DD5344";
-	private static final String COLOR_8F4827 = "8F4827";
-	private static final String COLOR_295185 = "295185";
-	private static final String COLOR_ADAB28 = "ADAB28";
-	private static final String COLOR_8F226B = "8F226B";
-	private static final String COLOR_626B21 = "626B21";
-	private static final String COLOR_AB8055 = "AB8055";
-	private static final String COLOR_7B473F = "7B473F";
-	private static final String COLOR_A428A6 = "A428A6";
-	private static final String COLOR_28A855 = "28A855";
-	private static final String COLOR_CE22A3 = "CE22A3";
-	private static final String COLOR_428227 = "428227";
-	private static final String COLOR_8585E9 = "8585E9";
-	private static final String COLOR_739E97 = "739E97";
 
 	@Override
 	public String getRouteColor(GRoute gRoute) {
@@ -198,53 +178,45 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			long routeId = getRouteId(gRoute);
 			switch ((int) routeId) {
 			// @formatter:off
-			case 40: return null; // agency color
-			case 50: return COLOR_FF0000;
-			case 51: return COLOR_33BA16; // COLOR_55FF00 to light
-			case 52: return COLOR_0070FF;
-			case 60: return COLOR_EB8323;
-			case 61: return COLOR_FFA77F;
-			case 62: return COLOR_DD5344;
-			case 63: return COLOR_8F4827;
-			case 64: return COLOR_295185;
-			case 65: return COLOR_ADAB28;
-			case 66: return COLOR_8F226B;
-			case 67: return COLOR_626B21;
-			case 68: return COLOR_AB8055;
-			case 70: return COLOR_7B473F;
-			case 71: return COLOR_A428A6;
-			case 80: return COLOR_28A855;
-			case 81: return COLOR_CE22A3;
-			case 93: return COLOR_428227;
-			case 94: return COLOR_8585E9;
-			case 95: return COLOR_739E97;
-			case 512100: return COLOR_33BA16; // COLOR_55FF00 to light
+			case 50: return "ED1D24";
+			case 51: return "00A651";
+			case 52: return "0072BC";
+			case 60: return "E977AF";
+			case 61: return "684287";
+			case 62: return "DC62A4";
+			case 63: return "F7941E";
+			case 64: return "A6664C";
+			case 65: return "FBAF34";
+			case 66: return "65A6BB";
+			case 67: return "2E3092";
+			case 68: return "00AEEF";
+			case 70: return "3EC7F4";
+			case 71: return "8DC63F";
+			case 72: return "8DC63F";
+			case 80: return "CF8B2D";
+			case 81: return "942976";
+			case 93: return "8FB73E";
+			case 94: return "41827C";
+			case 95: return "F58473";
 			case 939495: return null; // agency color
 			// @formatter:on
 			}
-			if (RID_MM == routeId) {
+			if (RID_MM == routeId) { // MM
 				return null; // agency color
-			}
-			if (50l + RID_ENDS_WITH_S == routeId) {
-				return COLOR_FF0000;
-			} else if (60l + RID_ENDS_WITH_LT == routeId) {
-				return COLOR_EB8323;
-			} else if (60l + RID_ENDS_WITH_LTS == routeId) {
-				return COLOR_EB8323;
-			} else if (6067l + RID_ENDS_WITH_C == routeId) {
+			} else if (60L + RID_ENDS_WITH_LT == routeId) {
+				return "E977AF"; // same as 60
+			} else if (60L + RID_ENDS_WITH_LTS == routeId) {
+				return "E977AF"; // same as 60
+			} else if (60_67L + RID_ENDS_WITH_C == routeId) { // 6067C
 				return null; // agency color
-			} else if (61l + RID_ENDS_WITH_B == routeId) {
-				return COLOR_FFA77F;
-			} else if (64l + RID_ENDS_WITH_B == routeId) {
-				return COLOR_52B1B6; // COLOR_73FFDF too light
-			} else if (8081 + RID_ENDS_WITH_C1 == routeId) {
+			} else if (61L + RID_ENDS_WITH_B == routeId) { // 61B
+				return "B0A0C5";
+			} else if (80_81L + RID_ENDS_WITH_C1 == routeId) { // 8081C1
 				return null; // agency color
-			} else if (8081 + RID_ENDS_WITH_C2 == routeId) {
+			} else if (80_81L + RID_ENDS_WITH_C2 == routeId) { // 8081C2
 				return null; // agency color
-			} else if (81l + RID_ENDS_WITH_S == routeId) {
-				return COLOR_CE22A3;
-			} else if (93L + RID_ENDS_WITH_P == routeId) {
-				return COLOR_428227;
+			} else if (81L + RID_ENDS_WITH_S == routeId) { // 81S
+				return "942976"; // same as 81
 			}
 			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
 			System.exit(-1);
@@ -261,7 +233,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String CALEDONIA = "Caledonia";
 	private static final String HIGHFIELD_SQ = "Highfield Sq";
 	private static final String BESSBOROUGH = "Bessborough";
-	private static final String CASINO = "Casino";
 	private static final String GAGNON_SHEDIAC = "Gagnon / Shediac";
 	private static final String KILLAM = "Killam";
 	private static final String HOSPITALS = "Hospitals";
@@ -275,6 +246,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String BOURQUE_CHARTERSVILLE = "Bourque / Chartersville";
 	private static final String SALISBURY_RD = "Salisbury Rd";
 	private static final String FOX_CRK_AMIRAULT = "Fox Crk / Amirault";
+	private static final String MOUNTAIN = "Mountain";
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
@@ -416,22 +388,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 								"6810200", // CF Champlain
 						})) //
 				.compileBothTripSort());
-		map2.put(62l, new RouteTripSpec(62l, //
+		map2.put(62L, new RouteTripSpec(62L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CASINO) //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, MOUNTAIN) // CASINO
 				.addTripSort(MDirectionType.EAST.intValue(), //
 						Arrays.asList(new String[] { //
-						"6810324", // Casino Dr (Casino)
+						"6811115", // Mountain at Turnaround
 								"6810330", //
 								"6810808", // 1576 Mountain
-								"6811014", //
+								"6810390", //
 								"6810785" // Plaza Blvd (Walmart)
 						})) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(new String[] { //
 						"6810785", // Plaza Blvd (Walmart)
 								"6810916", //
-								"6810324" // Casino Dr (Casino)
+								"6811115", // Mountain at Turnaround
 						})) //
 				.compileBothTripSort());
 		map2.put(63l, new RouteTripSpec(63l, //
@@ -543,6 +515,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						"6811029", // South Plaza Sud
 								"6811111", // ++
 								"6810841" // Coliseum Entrance
+						})) //
+				.compileBothTripSort());
+		map2.put(72L, new RouteTripSpec(72L, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HOSPITALS) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810401", // 114 MacBeath (across Hospital)
+								"6810378", // ++
+								"6810200", // CF Champlain
+						})) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810200", // CF Champlain
+								"6810747", // ++
+								"6810401", // 114 MacBeath (across Hospital)
 						})) //
 				.compileBothTripSort());
 		map2.put(80l, new RouteTripSpec(80l, //
