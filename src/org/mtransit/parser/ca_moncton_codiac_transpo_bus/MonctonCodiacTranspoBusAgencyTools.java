@@ -554,13 +554,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
 						Arrays.asList(new String[] { "6810413", "6810544", "6810552" })) //
 				.compileBothTripSort());
-		map2.put(8081l + RID_ENDS_WITH_C2, new RouteTripSpec(8081l + RID_ENDS_WITH_C2, // 80-81 c2
+		map2.put(8081L + RID_ENDS_WITH_C2, new RouteTripSpec(8081L + RID_ENDS_WITH_C2, // 80-81 c2
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810589", "6810568", "6810413" })) //
+						Arrays.asList(new String[] { //
+						"6810568", // Riverview Place
+								"6810497", // ++
+								"6810413", // 1110 Main (Events Centre)
+						})) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810552", "6810589" })) //
+						Arrays.asList(new String[] { //
+						"6810413", // 1110 Main (Events Centre)
+								"6810552", // ++ Manning @ Hillsborough
+								"6810566", // ++ Hillsborough across Hillview
+								"6810568", // Riverview Place
+						})) //
 				.compileBothTripSort());
 		map2.put(81l, new RouteTripSpec(81l, //
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
