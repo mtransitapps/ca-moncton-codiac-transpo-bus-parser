@@ -29,9 +29,8 @@ import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 import org.mtransit.parser.mt.data.MTripStop;
 
-// http://www.moncton.ca/Government/Terms_of_use/Open_Data_Purpose/Data_Catalogue/Transit_Files__GTFS_.htm
-// http://www.moncton.ca/Gouvernement/Donn_es_ouvertes/Donn_es_ouvertes_-_Objectif/Catalogue_de_donn_es/Fichiers_Transit__GTFS_.htm
-// http://www.moncton.ca/gtfs/google_transit.zip
+// https://catalogue-moncton.opendata.arcgis.com/datasets/transit-files-gtfs
+// https://www7.moncton.ca/opendata/google_transit.zip
 public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(String[] args) {
