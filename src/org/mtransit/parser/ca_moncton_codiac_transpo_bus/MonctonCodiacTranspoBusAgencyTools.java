@@ -104,6 +104,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final long RID_ENDS_WITH_C2 = 28L * 10_000L;
 	private static final long RID_ENDS_WITH_LT = 29L * 10_000L;
 	private static final long RID_ENDS_WITH_LTS = 30L * 10_000L;
+	private static final long RID_ENDS_WITH_L = 31L * 10_000L;
 
 	private static final String B = "b";
 	private static final String C = "c";
@@ -114,6 +115,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String C2 = "c2";
 	private static final String LT = "lt";
 	private static final String LTS = "lts";
+	private static final String L = "l";
 
 	private static final long RID_MM = 99_000L;
 
@@ -135,6 +137,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_LTS + id;
 			} else if (rsn.endsWith(LT)) {
 				return RID_ENDS_WITH_LT + id;
+			} else if (rsn.endsWith(L)) {
+				return RID_ENDS_WITH_L + id;
 			} else if (rsn.endsWith(B)) {
 				return RID_ENDS_WITH_B + id;
 			} else if (rsn.endsWith(C)) {
@@ -174,7 +178,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	public String getAgencyColor() {
 		return AGENCY_COLOR;
 	}
-
 
 	@Override
 	public String getRouteColor(GRoute gRoute) {
@@ -221,6 +224,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return null; // agency color
 			} else if (81L + RID_ENDS_WITH_S == routeId) { // 81S
 				return "942976"; // same as 81
+			} else if (93L + RID_ENDS_WITH_L == routeId) { // 93L
+				return "8FB73E"; // same as 93
 			}
 			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
 			System.exit(-1);
@@ -251,6 +256,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String SALISBURY_RD = "Salisbury Rd";
 	private static final String FOX_CRK_AMIRAULT = "Fox Crk / Amirault";
 	private static final String MOUNTAIN = "Mountain";
+	private static final String LAKEBURN = "Lakeburn";
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
@@ -599,6 +605,22 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 						Arrays.asList(new String[] { //
 						"6810986", // Dieppe Blvd (Arc. Quality Inn)
 								"6810880", //
+								"6810200", // CF Champlain
+						})) //
+				.compileBothTripSort());
+		map2.put(93L + RID_ENDS_WITH_L, new RouteTripSpec(93L + RID_ENDS_WITH_L, // 93L
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, LAKEBURN, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6810200", // CF Champlain
+								"6810613", // ++ 560 Champlain
+								"6811136", // 1634 Champlain =>
+						})) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(new String[] { //
+						"6811136", // 1634 Champlain <=
+								"6811125", // ++ Champlain @ Midland Dr
 								"6810200", // CF Champlain
 						})) //
 				.compileBothTripSort());
