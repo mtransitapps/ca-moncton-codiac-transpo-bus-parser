@@ -49,7 +49,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	public void start(String[] args) {
 		System.out.printf("\nGenerating Codiac Transpo bus data...");
 		long start = System.currentTimeMillis();
-		this.serviceIds = extractUsefulServiceIds(args, this);
+		this.serviceIds = extractUsefulServiceIds(args, this, true);
 		super.start(args);
 		System.out.printf("\nGenerating Codiac Transpo bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
@@ -98,6 +98,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final long RID_ENDS_WITH_A = 10_000L;
 	private static final long RID_ENDS_WITH_B = 20_000L;
 	private static final long RID_ENDS_WITH_C = 30_000L;
+	private static final long RID_ENDS_WITH_D = 40_000L;
 	private static final long RID_ENDS_WITH_P = 160_000L;
 	private static final long RID_ENDS_WITH_S = 190_000L;
 	//
@@ -109,6 +110,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String A = "a";
 	private static final String B = "b";
 	private static final String C = "c";
+	private static final String D = "d";
 	private static final String P = "p";
 	private static final String S = "s";
 	//
@@ -143,6 +145,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_B + id;
 			} else if (rsn.endsWith(C)) {
 				return RID_ENDS_WITH_C + id;
+			} else if (rsn.endsWith(D)) {
+				return RID_ENDS_WITH_D + id;
 			} else if (rsn.endsWith(P)) {
 				return RID_ENDS_WITH_P + id;
 			} else if (rsn.endsWith(S)) {
@@ -200,9 +204,12 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			case 70: return "3EC7F4";
 			case 71: return "8DC63F";
 			case 72: return "8DC63F";
+			case 73: return "6A3B0C";
 			case 75: return "732600";
 			case 80: return "CF8B2D";
 			case 81: return "942976";
+			case 82: return "FDCC08";
+			case 83: return "B63030";
 			case 93: return "8FB73E";
 			case 94: return "41827C";
 			case 95: return "F58473";
@@ -219,6 +226,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return null; // agency color
 			} else if (61L + RID_ENDS_WITH_B == routeId) { // 61B
 				return "B0A0C5";
+			} else if (6851L + RID_ENDS_WITH_D == routeId) { // 6851D
+				return null;
 			} else if (80_81L + RID_ENDS_WITH_C1 == routeId) { // 8081C1
 				return null; // agency color
 			} else if (80_81L + RID_ENDS_WITH_C2 == routeId) { // 8081C2
@@ -707,6 +716,16 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
+		if (mTrip.getRouteId() == 82L) { //
+			if (Arrays.asList( //
+					"Riverview Pl Routing", //
+					"Gunningsville" //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("Gunningsville", mTrip.getHeadsignId());
+				return true;
+			}
+		}
 		System.out.printf("\nUnexpected trips to merge %s & %s!\n", mTrip, mTripToMerge);
 		System.exit(-1);
 		return false;
