@@ -654,9 +654,21 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
 				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, FOX_CRK_AMIRAULT) //
 				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810668", "6810982", "6810200" })) //
+						Arrays.asList(new String[] { //
+						"6810668", // Amirault @ Jacques <=
+								"6810982", // ++
+								"6810200" //  CF Champlain
+						 })) //
 				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810664", "6810668" })) //
+						Arrays.asList(new String[] { //
+						"6810200", //  CF Champlain
+								"6810608", // ==
+								"6811169", // !=
+								"6811170", // !=
+								"6810661", // ==
+								"6810664", // ++
+								"6810668" // Amirault @ Jacques =>
+						})) //
 				.compileBothTripSort());
 		map2.put(94L, new RouteTripSpec(94L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BOURQUE_CHARTERSVILLE, //
