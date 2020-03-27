@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
+import org.mtransit.parser.MTLog;
 import org.mtransit.parser.Pair;
 import org.mtransit.parser.SplitUtils;
 import org.mtransit.parser.SplitUtils.RouteTripSpec;
@@ -47,11 +48,11 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating Codiac Transpo bus data...");
+		MTLog.log("Generating Codiac Transpo bus data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this, true);
 		super.start(args);
-		System.out.printf("\nGenerating Codiac Transpo bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		MTLog.log("Generating Codiac Transpo bus data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -125,7 +126,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
-		String rsn = gRoute.getRouteId().toLowerCase(Locale.ENGLISH);
+		String rsn = gRoute.getRouteShortName().toLowerCase(Locale.ENGLISH);
 		if (Utils.isDigitsOnly(rsn)) {
 			return Long.parseLong(rsn); // use route short name as route ID
 		}
@@ -157,20 +158,13 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_C2 + id;
 			}
 		}
-		System.out.printf("\nUnexpected route ID for %s!\n", gRoute);
-		System.exit(-1);
-		return -1l;
-	}
-
-	@Override
-	public String getRouteShortName(GRoute gRoute) {
-		return gRoute.getRouteId().toUpperCase(Locale.ENGLISH);
+		MTLog.logFatal("Unexpected route ID for %s!", gRoute);
+		return -1L;
 	}
 
 	@Override
 	public boolean mergeRouteLongName(MRoute mRoute, MRoute mRouteToMerge) {
-		System.out.printf("\nUnexpected routes to merge %s & %s!\n", mRoute, mRouteToMerge);
-		System.exit(-1);
+		MTLog.logFatal("Unexpected routes to merge %s & %s!", mRoute, mRouteToMerge);
 		return false;
 	}
 
@@ -237,8 +231,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			} else if (93L + RID_ENDS_WITH_A == routeId) { // 93A
 				return "A94D3F"; // same as 93
 			}
-			System.out.printf("\nUnexpected route color for %s!\n", gRoute);
-			System.exit(-1);
+			MTLog.logFatal("Unexpected route color for %s!", gRoute);
 			return null;
 		}
 		return super.getRouteColor(gRoute);
@@ -271,421 +264,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<Long, RouteTripSpec>();
-		map2.put(50L, new RouteTripSpec(50L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810785", // Plaza Blvd (Walmart)
-								"6810205", // ++
-								"6810200", // CF Champlain
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", // CF Champlain
-								"6810202", // ++
-								"6810785", // Plaza Blvd (Walmart)
-						})) //
-				.compileBothTripSort());
-		map2.put(50l + RID_ENDS_WITH_S, new RouteTripSpec(50l + RID_ENDS_WITH_S, // 50 S
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810785", "6810205", "6810200" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810202", "6810785" })) //
-				.compileBothTripSort());
-		map2.put(51L, new RouteTripSpec(51L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810785", "6810225", "6810234" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810234", "6810241", "6810785" })) //
-				.compileBothTripSort());
-		map2.put(512100L, new RouteTripSpec(512100L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, "Trinity Dr") // PLAZA_BLVD
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810786", // Trinity Drive
-								"6810225", //
-								"6810234" // 1111 Main
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810234", // 1111 Main
-								"6810241", //
-								"6810786", // Trinity Drive
-						})) //
-				.compileBothTripSort());
-		map2.put(52L, new RouteTripSpec(52L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810234", "6810253", "6810200" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810263", "6810234" })) //
-				.compileBothTripSort());
-		map2.put(60L, new RouteTripSpec(60L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BESSBOROUGH) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810277", "6810770", "6810286", "6810234" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810234", "6810763", "6810277" })) //
-				.compileBothTripSort());
-		map2.put(6067L + RID_ENDS_WITH_C, new RouteTripSpec(6067L + RID_ENDS_WITH_C, // 6067C
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BESSBOROUGH) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810277", // 1000 St George (Bessborough)
-								"6810771", //
-								"6810234" // 1111 Main
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810234", // 1111 Main
-								"6810763", //
-								"6810277" // 1000 St George (Bessborough)
-						})) //
-				.compileBothTripSort());
-		map2.put(60l + RID_ENDS_WITH_LT, new RouteTripSpec(60l + RID_ENDS_WITH_LT, // 60LT
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, SALISBURY_RD) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810483", // Atlantic Baptist
-								"6810770", //
-								"6810234" // 1111 Main
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810234", // 1111 Main
-								"6810471", //
-								"6810483" // Atlantic Baptist
-						})) //
-				.compileBothTripSort());
-		map2.put(60l + RID_ENDS_WITH_LTS, new RouteTripSpec(60l + RID_ENDS_WITH_LTS, // 60LTS
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, _140_MILLENNIUM, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, SALISBURY_RD) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810483", "6810770", "6810286" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810234", "6810483" })) //
-				.compileBothTripSort());
-		map2.put(61L, new RouteTripSpec(61L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", // CF Champlain
-								"6810298", // ++
-								"6810309", // Hennessey Petro-Canada
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810309", // Hennessey Petro-Canada
-								"6810781", // ++ 54 Elmwood Dr
-								"6810316", // ++
-								"6810200", // CF Champlain
-						})) //
-				.compileBothTripSort());
-		map2.put(61l + RID_ENDS_WITH_B, new RouteTripSpec(61l + RID_ENDS_WITH_B, // 61B
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, ELMWOOD, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", // CF Champlain
-								"6810422", // ++
-								"6810954", // 603 Elmwood
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810954", // 603 Elmwood
-								"6810962", // ++
-								"6810200", // CF Champlain
-						})) //
-				.compileBothTripSort());
-		map2.put(62L, new RouteTripSpec(62L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, MOUNTAIN) // CASINO
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6811115", // Mountain at Turnaround
-								"6810330", //
-								"6810808", // 1576 Mountain
-								"6810390", //
-								"6810785" // Plaza Blvd (Walmart)
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810785", // Plaza Blvd (Walmart)
-								"6810916", //
-								"6811115", // Mountain at Turnaround
-						})) //
-				.compileBothTripSort());
-		map2.put(63L, new RouteTripSpec(63L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, GAGNON_SHEDIAC, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810347", "6810702" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810702", "6810703", "6810200" })) //
-				.compileBothTripSort());
-		map2.put(64L, new RouteTripSpec(64L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HOSPITALS, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810234", "6810376", "6810380" })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810380", "6810757", "6810234" })) //
-				.compileBothTripSort());
-		map2.put(64l + RID_ENDS_WITH_B, new RouteTripSpec(64l + RID_ENDS_WITH_B, // 64B
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HOSPITALS, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, _1111_MAIN) // HIGHFIELD_SQ
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810234", "6810747", "6810401" //
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810401", "6810727", "6810234" //
-						})) //
-				.compileBothTripSort());
-		map2.put(65L, new RouteTripSpec(65L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, KILLAM) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810406", // 25 Killam (Asian Garden)
-								"6810408", // 121 Killam (Chubby's Variety)
-								"6810906", //
-								"6810785", // Plaza Blvd (Walmart)
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810785", // Plaza Blvd (Walmart)
-								"6810809", //
-								"6810401", //
-								"6810406" // 25 Killam (Asian Garden)
-						})) //
-				.compileBothTripSort());
-		map2.put(66L, new RouteTripSpec(66L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CALEDONIA, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810413", // 1110 Main
-								"6810419", // ++
-								"6810883", //
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810883", //
-								"6811032", // ++
-								"6810413", // 1110 Main
-						})) //
-				.compileBothTripSort());
-		map2.put(67L, new RouteTripSpec(67L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, EDINBURGH) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810806", "6810768", "6810413" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810799", "6810806" })) //
-				.compileBothTripSort());
-		map2.put(68L, new RouteTripSpec(68L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, KE_SPENCER_MEMORIAL_HOME) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810483", "6810493", "6810413" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810471", "6810483" })) //
-				.compileBothTripSort());
-		map2.put(70L, new RouteTripSpec(70L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CRANDALL_U, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6811029", // South Plaza Sud
-								"6811015", //
-								"6811055", // Crandall Entrance
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6811055", // Crandall Entrance
-								"6810520", //
-								"6811029", // South Plaza Sud
-						})) //
-				.compileBothTripSort());
-		map2.put(71L, new RouteTripSpec(71L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, COLISEUM) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810841", // Coliseum Entrance
-								"6810537", // ++
-								"6810808", // 1576 Mountain
-								"6811029", // South Plaza Sud
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6811029", // South Plaza Sud
-								"6811111", // ++
-								"6810841" // Coliseum Entrance
-						})) //
-				.compileBothTripSort());
-		map2.put(72L, new RouteTripSpec(72L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HOSPITALS) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810401", // 114 MacBeath (across Hospital)
-								"6810378", // ++
-								"6810200", // CF Champlain
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", // CF Champlain
-								"6810747", // ++
-								"6810401", // 114 MacBeath (across Hospital)
-						})) //
-				.compileBothTripSort());
-		map2.put(75L, new RouteTripSpec(75L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, "Magnetic Hl", //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, PLAZA_BLVD) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810785", // North Plaza Nord
-								"6811114", // ++ Mountain at Magic Mountain
-								"6811160", // Magnetic Hill Zoo >>
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6811160", // Magnetic Hill Zoo <<
-								"6810523", // ++ 1634 Mountain at Hildegard
-								"6810785", // North Plaza Nord
-						})) //
-				.compileBothTripSort());
-		map2.put(80L, new RouteTripSpec(80L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, BRIDGEDALE) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810552", "6810561", "6810413" })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810544", "6810552" })) //
-				.compileBothTripSort());
-		map2.put(8081l + RID_ENDS_WITH_C1, new RouteTripSpec(8081l + RID_ENDS_WITH_C1, // 80-81 c1
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, BRIDGEDALE) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810552", "6810561", "6810413" })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810544", "6810552" })) //
-				.compileBothTripSort());
-		map2.put(8081L + RID_ENDS_WITH_C2, new RouteTripSpec(8081L + RID_ENDS_WITH_C2, // 80-81 c2
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810568", // Riverview Place
-								"6810497", // ++
-								"6810413", // 1110 Main (Events Centre)
-						})) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810413", // 1110 Main (Events Centre)
-								"6810552", // ++ Manning @ Hillsborough
-								"6810566", // ++ Hillsborough across Hillview
-								"6810568", // Riverview Place
-						})) //
-				.compileBothTripSort());
-		map2.put(81L, new RouteTripSpec(81L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810588", "6810568", "6810413" })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810568", "6810588" })) //
-				.compileBothTripSort());
-		map2.put(81l + RID_ENDS_WITH_S, new RouteTripSpec(81l + RID_ENDS_WITH_S, // 81S
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, HIGHFIELD_SQ, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, RIVERVIEW) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6810589", "6810568", "6810413" })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810413", "6810568", "6810589" })) //
-				.compileBothTripSort());
-		map2.put(93L, new RouteTripSpec(93L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, ADÉLARD_SAVOIE_DIEPPE_BLVD, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", // CF Champlain
-								"6810613", //
-								"6810986", // Dieppe Blvd (Arc. Quality Inn)
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810986", // Dieppe Blvd (Arc. Quality Inn)
-								"6810880", //
-								"6810200", // CF Champlain
-						})) //
-				.compileBothTripSort());
-		map2.put(93L + RID_ENDS_WITH_A, new RouteTripSpec(93L + RID_ENDS_WITH_A, // 93A
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, LAKEBURN, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", // CF Champlain
-								"6810613", // ++ 560 Champlain
-								"6811136", // 1634 Champlain =>
-						})) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { //
-						"6811136", // 1634 Champlain <=
-								"6811125", // ++ Champlain @ Midland Dr
-								"6810200", // CF Champlain
-						})) //
-				.compileBothTripSort());
-		map2.put(939495L, new RouteTripSpec(939495L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, FOX_CRK_AMIRAULT) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810668", // Amirault @ Jacques <=
-								"6810982", // ++
-								"6810200" //  CF Champlain
-						 })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { //
-						"6810200", //  CF Champlain
-								"6810608", // ==
-								"6811169", // !=
-								"6811170", // !=
-								"6810661", // ==
-								"6810664", // ++
-								"6810668" // Amirault @ Jacques =>
-						})) //
-				.compileBothTripSort());
-		map2.put(94L, new RouteTripSpec(94L, //
-				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, BOURQUE_CHARTERSVILLE, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL) //
-				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810978", "6810935" })) //
-				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "6810935", "6810982", "6810200" })) //
-				.compileBothTripSort());
-		map2.put(95L, new RouteTripSpec(95L, //
-				MDirectionType.NORTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, CHAMPLAIN_PL, //
-				MDirectionType.SOUTH.intValue(), MTrip.HEADSIGN_TYPE_STRING, FOX_CRK_AMIRAULT) //
-				.addTripSort(MDirectionType.NORTH.intValue(), //
-						Arrays.asList(new String[] { "6811002", "6810859", "6810200" })) //
-				.addTripSort(MDirectionType.SOUTH.intValue(), //
-						Arrays.asList(new String[] { "6810200", "6810664", "6811002" })) //
-				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}
 
@@ -729,6 +307,33 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
 		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
+		if (mTrip.getRouteId() == 61L + RID_ENDS_WITH_A) { // 61A
+			if (Arrays.asList( //
+					"Elmwood Dr & Donald Ave", //
+					"CF Champlain" //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("CF Champlain", mTrip.getHeadsignId());
+				return true;
+			}
+		}
+		if (mTrip.getRouteId() == 64L) { //
+			if (Arrays.asList( //
+					"Ctr Hospitalier Universaire", //
+					"1111 Main" //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("1111 Main", mTrip.getHeadsignId());
+				return true;
+			}
+		}
+		if (mTrip.getRouteId() == 65L) { //
+			if (Arrays.asList( //
+					"Killam Dr & Purdy Ave", //
+					"North Plz" //
+					).containsAll(headsignsValues)) {
+				mTrip.setHeadsignString("North Plz", mTrip.getHeadsignId());
+				return true;
+			}
+		}
 		if (mTrip.getRouteId() == 82L) { //
 			if (Arrays.asList( //
 					"Riverview Pl Routing", //
@@ -738,12 +343,23 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		}
-		System.out.printf("\nUnexpected trips to merge %s & %s!\n", mTrip, mTripToMerge);
-		System.exit(-1);
+		MTLog.logFatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
 		return false;
 	}
 
 	private static final Pattern TOWARDS = Pattern.compile("((^|\\W){1}(towards)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern AVENIR_CENTER_ = CleanUtils.cleanWords("Avenir Centre Avenir");
+	private static final String AVENIR_CENTER_REPLACEMENT = CleanUtils.cleanWordsReplacement("Avenir Ctr");
+
+	private static final Pattern CF_CHAMPLAIN_ = CleanUtils.cleanWords("cf champlaim");
+	private static final String CF_CHAMPLAIN_REPLACEMENT = CleanUtils.cleanWordsReplacement("CF Champlain");
+
+	private static final Pattern NORTH_PLAZA_ = CleanUtils.cleanWords("north plaza nord");
+	private static final String NORTH_PLAZA_REPLACEMENT = CleanUtils.cleanWordsReplacement("North Plz");
+
+	private static final Pattern SOUTH_PLAZA_ = CleanUtils.cleanWords("south plaza sud");
+	private static final String SOUTH_PLAZA_REPLACEMENT = CleanUtils.cleanWordsReplacement("South Plz");
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
@@ -752,6 +368,11 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			String gTripHeadsignAfterTOWARDS = tripHeadsign.substring(matcherTOWARDS.end());
 			tripHeadsign = gTripHeadsignAfterTOWARDS;
 		}
+		tripHeadsign = AVENIR_CENTER_.matcher(tripHeadsign).replaceAll(AVENIR_CENTER_REPLACEMENT);
+		tripHeadsign = CF_CHAMPLAIN_.matcher(tripHeadsign).replaceAll(CF_CHAMPLAIN_REPLACEMENT);
+		tripHeadsign = NORTH_PLAZA_.matcher(tripHeadsign).replaceAll(NORTH_PLAZA_REPLACEMENT);
+		tripHeadsign = SOUTH_PLAZA_.matcher(tripHeadsign).replaceAll(SOUTH_PLAZA_REPLACEMENT);
+		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
 		tripHeadsign = CleanUtils.removePoints(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
@@ -775,5 +396,29 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		gStopName = CleanUtils.cleanNumbers(gStopName);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
+	}
+
+	@Override
+	public int getStopId(GStop gStop) {
+		String stopCode = gStop.getStopCode();
+		if (Utils.isDigitsOnly(stopCode)) {
+			return Integer.parseInt(stopCode);
+		}
+		Matcher matcher = DIGITS.matcher(stopCode);
+		if (matcher.find()) {
+			int digits = Integer.parseInt(matcher.group());
+			if (true) { // LIKE BEFORE
+				return 6_810_000 + digits;
+			}
+			if (stopCode.startsWith("D")) {
+				return 40_000 + digits;
+			} else if (stopCode.startsWith("M")) {
+				return 130_000 + digits;
+			} else if (stopCode.startsWith("R")) {
+				return 180_000 + digits;
+			}
+		}
+		MTLog.logFatal("Unexpected stop ID for %s!", gStop);
+		return -1;
 	}
 }
