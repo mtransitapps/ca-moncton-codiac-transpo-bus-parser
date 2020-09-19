@@ -30,7 +30,7 @@ import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 import org.mtransit.parser.mt.data.MTripStop;
 
-// https://catalogue-moncton.opendata.arcgis.com/datasets/transit-files-gtfs
+// https://open.moncton.ca/datasets/transit-files-gtfs
 // https://www7.moncton.ca/opendata/google_transit.zip
 public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
@@ -158,14 +158,12 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_C2 + id;
 			}
 		}
-		MTLog.logFatal("Unexpected route ID for %s!", gRoute);
-		return -1L;
+		throw new MTLog.Fatal("Unexpected route ID for %s!", gRoute);
 	}
 
 	@Override
 	public boolean mergeRouteLongName(MRoute mRoute, MRoute mRouteToMerge) {
-		MTLog.logFatal("Unexpected routes to merge %s & %s!", mRoute, mRouteToMerge);
-		return false;
+		throw new MTLog.Fatal("Unexpected routes to merge %s & %s!", mRoute, mRouteToMerge);
 	}
 
 	private static final String AGENCY_COLOR_GREEN = "005238"; // GREEN (from PDF)
@@ -231,8 +229,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			} else if (93L + RID_ENDS_WITH_A == routeId) { // 93A
 				return "A94D3F"; // same as 93
 			}
-			MTLog.logFatal("Unexpected route color for %s!", gRoute);
-			return null;
+			throw new MTLog.Fatal("Unexpected route color for %s!", gRoute);
 		}
 		return super.getRouteColor(gRoute);
 	}
@@ -343,8 +340,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return true;
 			}
 		}
-		MTLog.logFatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
-		return false;
+		throw new MTLog.Fatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
 	}
 
 	private static final Pattern TOWARDS = Pattern.compile("((^|\\W){1}(towards)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
@@ -418,7 +414,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return 180_000 + digits;
 			}
 		}
-		MTLog.logFatal("Unexpected stop ID for %s!", gStop);
-		return -1;
+		throw new MTLog.Fatal("Unexpected stop ID for %s!", gStop);
 	}
 }
