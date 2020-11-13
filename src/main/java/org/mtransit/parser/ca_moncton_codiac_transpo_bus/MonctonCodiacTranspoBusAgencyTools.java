@@ -85,11 +85,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public boolean excludeRoute(GRoute gRoute) {
-		return super.excludeRoute(gRoute);
-	}
-
-	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_BUS;
 	}
@@ -121,8 +116,10 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String LTS = "lts";
 
 	private static final long RID_MM = 99_000L;
+	private static final long RID_METS = 99_001L;
 
 	private static final String MM_RID = "MM";
+	private static final String METS_RID = "METS";
 
 	@Override
 	public long getRouteId(GRoute gRoute) {
@@ -132,6 +129,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		}
 		if (MM_RID.equalsIgnoreCase(rsn)) {
 			return RID_MM;
+		} else if (METS_RID.equalsIgnoreCase(rsn)) {
+			return RID_METS;
 		}
 		Matcher matcher = DIGITS.matcher(rsn);
 		if (matcher.find()) {
@@ -158,7 +157,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 				return RID_ENDS_WITH_C2 + id;
 			}
 		}
-		throw new MTLog.Fatal("Unexpected route ID for %s!", gRoute);
+		throw new MTLog.Fatal("Unexpected route ID for %s!", gRoute.toStringPlus());
 	}
 
 	@Override
@@ -210,6 +209,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			}
 			if (RID_MM == routeId) { // MM
 				return null; // agency color
+			} else if (RID_METS == routeId) { // METS
+				return null; // agency color
 			} else if (60L + RID_ENDS_WITH_LT == routeId) {
 				return "E977AF"; // same as 60
 			} else if (60L + RID_ENDS_WITH_LTS == routeId) {
@@ -229,38 +230,14 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			} else if (93L + RID_ENDS_WITH_A == routeId) { // 93A
 				return "A94D3F"; // same as 93
 			}
-			throw new MTLog.Fatal("Unexpected route color for %s!", gRoute);
+			throw new MTLog.Fatal("Unexpected route color for %s!", gRoute.toStringPlus());
 		}
 		return super.getRouteColor(gRoute);
 	}
 
-	private static final String PLAZA_BLVD = "Plz Blvd";
-	private static final String _140_MILLENNIUM = "140 Millennium";
-	private static final String _1111_MAIN = "1111 Main";
-	private static final String ELMWOOD = "Elmwood";
-	private static final String CHAMPLAIN_PL = "Champlain Pl";
-	private static final String CALEDONIA = "Caledonia";
-	private static final String HIGHFIELD_SQ = "Highfield Sq";
-	private static final String BESSBOROUGH = "Bessborough";
-	private static final String GAGNON_SHEDIAC = "Gagnon / Shediac";
-	private static final String KILLAM = "Killam";
-	private static final String HOSPITALS = "Hospitals";
-	private static final String EDINBURGH = "Edinburgh";
-	private static final String KE_SPENCER_MEMORIAL_HOME = "KE Spencer Memorial Home";
-	private static final String CRANDALL_U = "Crandall U";
-	private static final String COLISEUM = "Coliseum";
-	private static final String BRIDGEDALE = "Bridgedale";
-	private static final String RIVERVIEW = "Riverview";
-	private static final String ADÉLARD_SAVOIE_DIEPPE_BLVD = "Adélard-Savoie / Dieppe Blvd";
-	private static final String BOURQUE_CHARTERSVILLE = "Bourque / Chartersville";
-	private static final String SALISBURY_RD = "Salisbury Rd";
-	private static final String FOX_CRK_AMIRAULT = "Fox Crk / Amirault";
-	private static final String MOUNTAIN = "Mountain";
-	private static final String LAKEBURN = "Lakeburn";
-
-	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
+	private static final HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 	static {
-		HashMap<Long, RouteTripSpec> map2 = new HashMap<Long, RouteTripSpec>();
+		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
 		ALL_ROUTE_TRIPS2 = map2;
 	}
 
