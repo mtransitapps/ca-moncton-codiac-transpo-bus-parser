@@ -14,12 +14,11 @@ import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
+import org.mtransit.parser.mt.data.MDirectionType;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -248,44 +247,44 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
+	public boolean directionFinderEnabled() {
+		return true;
+	}
+
+	@Override
+	public int getDirectionType() {
+		return MTrip.HEADSIGN_TYPE_DIRECTION;
+	}
+
+	@Nullable
+	@Override
+	public MDirectionType convertDirection(@Nullable String headSign) {
+		if (headSign != null) {
+			if ("North / Nord".equalsIgnoreCase(headSign)
+					|| "N / Nord".equalsIgnoreCase(headSign)
+					|| "North".equalsIgnoreCase(headSign)
+					|| "N".equalsIgnoreCase(headSign)) {
+				return MDirectionType.NORTH;
+			} else if ("South / Sud".equalsIgnoreCase(headSign)
+					|| "S / Sud".equalsIgnoreCase(headSign)
+					|| "South".equalsIgnoreCase(headSign)
+					|| "S".equalsIgnoreCase(headSign)) {
+				return MDirectionType.SOUTH;
+			}
+		}
+		return null;
+	}
+
+	@NotNull
+	@Override
+	public String cleanDirectionHeadsign(boolean fromStopName, @NotNull String directionHeadSign) {
+		directionHeadSign = super.cleanDirectionHeadsign(fromStopName, directionHeadSign);
+		directionHeadSign = CleanUtils.cleanBounds(directionHeadSign); // only kept EN for now
+		return directionHeadSign;
+	}
+
+	@Override
 	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
-		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
-		if (mTrip.getRouteId() == 61L + RID_ENDS_WITH_A) { // 61A
-			if (Arrays.asList( //
-					"Elmwood Dr & Donald Ave", //
-					"CF Champlain" //
-			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString("CF Champlain", mTrip.getHeadsignId());
-				return true;
-			}
-		}
-		if (mTrip.getRouteId() == 64L) { //
-			if (Arrays.asList( //
-					"Ctr Hospitalier Universaire", //
-					"1111 Main" //
-			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString("1111 Main", mTrip.getHeadsignId());
-				return true;
-			}
-		}
-		if (mTrip.getRouteId() == 65L) { //
-			if (Arrays.asList( //
-					"Killam Dr & Purdy Ave", //
-					"North Plz" //
-			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString("North Plz", mTrip.getHeadsignId());
-				return true;
-			}
-		}
-		if (mTrip.getRouteId() == 82L) { //
-			if (Arrays.asList( //
-					"Riverview Pl Routing", //
-					"Gunningsville" //
-			).containsAll(headsignsValues)) {
-				mTrip.setHeadsignString("Gunningsville", mTrip.getHeadsignId());
-				return true;
-			}
-		}
 		throw new MTLog.Fatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
 	}
 
@@ -295,10 +294,10 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern CF_CHAMPLAIN_ = CleanUtils.cleanWords("cf champlaim");
 	private static final String CF_CHAMPLAIN_REPLACEMENT = CleanUtils.cleanWordsReplacement("CF Champlain");
 
-	private static final Pattern NORTH_PLAZA_ = CleanUtils.cleanWords("north plaza nord");
+	private static final Pattern NORTH_PLAZA_ = CleanUtils.cleanWords("north plaza nord", "north plz nord");
 	private static final String NORTH_PLAZA_REPLACEMENT = CleanUtils.cleanWordsReplacement("North Plz");
 
-	private static final Pattern SOUTH_PLAZA_ = CleanUtils.cleanWords("south plaza sud");
+	private static final Pattern SOUTH_PLAZA_ = CleanUtils.cleanWords("south plaza sud", "south plz sud");
 	private static final String SOUTH_PLAZA_REPLACEMENT = CleanUtils.cleanWordsReplacement("South Plz");
 
 	private static final Pattern COLISEUM_ = Pattern.compile("(coliseum - colisée)", Pattern.CASE_INSENSITIVE);
@@ -306,12 +305,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	private static final Pattern HOSP_ = Pattern.compile("(hospitals - hôpitaux)", Pattern.CASE_INSENSITIVE);
 	private static final String HOSP_REPLACEMENT = "Hospitals"; // FIXME support for head-sign string i18n
-
-	private static final Pattern NORTH_ = Pattern.compile("(north / nord)", Pattern.CASE_INSENSITIVE);
-	private static final String NORTH_REPLACEMENT = "North"; // FIXME support for head-sign string i18n
-
-	private static final Pattern SOUTH_ = Pattern.compile("(south / sud)", Pattern.CASE_INSENSITIVE);
-	private static final String SOUTH_REPLACEMENT = "South"; // FIXME support for head-sign string i18n
 
 	private static final Pattern STARTS_W_SHUTTLE_FOR_ = Pattern.compile("(^shuttle for )", Pattern.CASE_INSENSITIVE);
 
@@ -324,8 +317,6 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		tripHeadsign = SOUTH_PLAZA_.matcher(tripHeadsign).replaceAll(SOUTH_PLAZA_REPLACEMENT);
 		tripHeadsign = COLISEUM_.matcher(tripHeadsign).replaceAll(COLISEUM_REPLACEMENT);
 		tripHeadsign = HOSP_.matcher(tripHeadsign).replaceAll(HOSP_REPLACEMENT);
-		tripHeadsign = NORTH_.matcher(tripHeadsign).replaceAll(NORTH_REPLACEMENT);
-		tripHeadsign = SOUTH_.matcher(tripHeadsign).replaceAll(SOUTH_REPLACEMENT);
 		tripHeadsign = STARTS_W_SHUTTLE_FOR_.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
