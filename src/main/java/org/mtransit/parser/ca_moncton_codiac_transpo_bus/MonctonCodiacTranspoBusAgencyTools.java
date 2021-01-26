@@ -1,21 +1,11 @@
 package org.mtransit.parser.ca_moncton_codiac_transpo_bus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
-import org.mtransit.parser.Pair;
-import org.mtransit.parser.SplitUtils;
-import org.mtransit.parser.SplitUtils.RouteTripSpec;
+import org.mtransit.parser.StringUtils;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
@@ -23,18 +13,24 @@ import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
-import org.mtransit.parser.gtfs.data.GTripStop;
 import org.mtransit.parser.mt.data.MAgency;
-import org.mtransit.parser.mt.data.MDirectionType;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
-import org.mtransit.parser.mt.data.MTripStop;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.mtransit.parser.StringUtils.EMPTY;
 
 // https://open.moncton.ca/datasets/transit-files-gtfs
 // https://www7.moncton.ca/opendata/google_transit.zip
 public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
-	public static void main(String[] args) {
+	public static void main(@Nullable String[] args) {
 		if (args == null || args.length == 0) {
 			args = new String[3];
 			args[0] = "input/gtfs.zip";
@@ -44,46 +40,48 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		new MonctonCodiacTranspoBusAgencyTools().start(args);
 	}
 
-	private HashSet<String> serviceIds;
+	@Nullable
+	private HashSet<Integer> serviceIdInts;
 
 	@Override
-	public void start(String[] args) {
+	public void start(@NotNull String[] args) {
 		MTLog.log("Generating Codiac Transpo bus data...");
 		long start = System.currentTimeMillis();
-		this.serviceIds = extractUsefulServiceIds(args, this, true);
+		this.serviceIdInts = extractUsefulServiceIdInts(args, this, true);
 		super.start(args);
 		MTLog.log("Generating Codiac Transpo bus data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
 	public boolean excludingAll() {
-		return this.serviceIds != null && this.serviceIds.isEmpty();
+		return this.serviceIdInts != null && this.serviceIdInts.isEmpty();
 	}
 
 	@Override
-	public boolean excludeCalendar(GCalendar gCalendar) {
-		if (this.serviceIds != null) {
-			return excludeUselessCalendar(gCalendar, this.serviceIds);
+	public boolean excludeCalendar(@NotNull GCalendar gCalendar) {
+		if (this.serviceIdInts != null) {
+			return excludeUselessCalendarInt(gCalendar, this.serviceIdInts);
 		}
 		return super.excludeCalendar(gCalendar);
 	}
 
 	@Override
-	public boolean excludeCalendarDate(GCalendarDate gCalendarDates) {
-		if (this.serviceIds != null) {
-			return excludeUselessCalendarDate(gCalendarDates, this.serviceIds);
+	public boolean excludeCalendarDate(@NotNull GCalendarDate gCalendarDates) {
+		if (this.serviceIdInts != null) {
+			return excludeUselessCalendarDateInt(gCalendarDates, this.serviceIdInts);
 		}
 		return super.excludeCalendarDate(gCalendarDates);
 	}
 
 	@Override
-	public boolean excludeTrip(GTrip gTrip) {
-		if (this.serviceIds != null) {
-			return excludeUselessTrip(gTrip, this.serviceIds);
+	public boolean excludeTrip(@NotNull GTrip gTrip) {
+		if (this.serviceIdInts != null) {
+			return excludeUselessTripInt(gTrip, this.serviceIdInts);
 		}
 		return super.excludeTrip(gTrip);
 	}
 
+	@NotNull
 	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_BUS;
@@ -122,7 +120,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String METS_RID = "METS";
 
 	@Override
-	public long getRouteId(GRoute gRoute) {
+	public long getRouteId(@NotNull GRoute gRoute) {
 		String rsn = gRoute.getRouteShortName().toLowerCase(Locale.ENGLISH);
 		if (Utils.isDigitsOnly(rsn)) {
 			return Long.parseLong(rsn); // use route short name as route ID
@@ -161,7 +159,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public boolean mergeRouteLongName(MRoute mRoute, MRoute mRouteToMerge) {
+	public boolean mergeRouteLongName(@NotNull MRoute mRoute, @NotNull MRoute mRouteToMerge) {
 		throw new MTLog.Fatal("Unexpected routes to merge %s & %s!", mRoute, mRouteToMerge);
 	}
 
@@ -169,13 +167,15 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	private static final String AGENCY_COLOR = AGENCY_COLOR_GREEN;
 
+	@NotNull
 	@Override
 	public String getAgencyColor() {
 		return AGENCY_COLOR;
 	}
 
+	@Nullable
 	@Override
-	public String getRouteColor(GRoute gRoute) {
+	public String getRouteColor(@NotNull GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
 			long routeId = getRouteId(gRoute);
 			switch ((int) routeId) {
@@ -235,57 +235,26 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return super.getRouteColor(gRoute);
 	}
 
-	private static final HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
-	static {
-		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
-		ALL_ROUTE_TRIPS2 = map2;
-	}
-
 	@Override
-	public int compareEarly(long routeId, List<MTripStop> list1, List<MTripStop> list2, MTripStop ts1, MTripStop ts2, GStop ts1GStop, GStop ts2GStop) {
-		if (ALL_ROUTE_TRIPS2.containsKey(routeId)) {
-			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop, this);
-		}
-		return super.compareEarly(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
-	}
-
-	@Override
-	public ArrayList<MTrip> splitTrip(MRoute mRoute, GTrip gTrip, GSpec gtfs) {
-		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
-			return ALL_ROUTE_TRIPS2.get(mRoute.getId()).getAllTrips();
-		}
-		return super.splitTrip(mRoute, gTrip, gtfs);
-	}
-
-	@Override
-	public Pair<Long[], Integer[]> splitTripStop(MRoute mRoute, GTrip gTrip, GTripStop gTripStop, ArrayList<MTrip> splitTrips, GSpec routeGTFS) {
-		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
-			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()), this);
-		}
-		return super.splitTripStop(mRoute, gTrip, gTripStop, splitTrips, routeGTFS);
-	}
-
-	@Override
-	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
-		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
-			return; // split
-		}
+	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
 		String tripHeadsign = gTrip.getTripHeadsign();
 		if (StringUtils.isEmpty(tripHeadsign)) {
 			tripHeadsign = mRoute.getLongName();
 		}
-		int directionId = gTrip.getDirectionId() == null ? 0 : gTrip.getDirectionId();
-		mTrip.setHeadsignString(cleanTripHeadsign(tripHeadsign), directionId);
+		mTrip.setHeadsignString(
+				cleanTripHeadsign(tripHeadsign),
+				gTrip.getDirectionId() == null ? 0 : gTrip.getDirectionId() // TODO  gTrip.getDirectionIdOrDefault()
+		);
 	}
 
 	@Override
-	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
 		List<String> headsignsValues = Arrays.asList(mTrip.getHeadsignValue(), mTripToMerge.getHeadsignValue());
 		if (mTrip.getRouteId() == 61L + RID_ENDS_WITH_A) { // 61A
 			if (Arrays.asList( //
 					"Elmwood Dr & Donald Ave", //
 					"CF Champlain" //
-					).containsAll(headsignsValues)) {
+			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString("CF Champlain", mTrip.getHeadsignId());
 				return true;
 			}
@@ -294,7 +263,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			if (Arrays.asList( //
 					"Ctr Hospitalier Universaire", //
 					"1111 Main" //
-					).containsAll(headsignsValues)) {
+			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString("1111 Main", mTrip.getHeadsignId());
 				return true;
 			}
@@ -303,7 +272,7 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			if (Arrays.asList( //
 					"Killam Dr & Purdy Ave", //
 					"North Plz" //
-					).containsAll(headsignsValues)) {
+			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString("North Plz", mTrip.getHeadsignId());
 				return true;
 			}
@@ -312,15 +281,13 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			if (Arrays.asList( //
 					"Riverview Pl Routing", //
 					"Gunningsville" //
-					).containsAll(headsignsValues)) {
+			).containsAll(headsignsValues)) {
 				mTrip.setHeadsignString("Gunningsville", mTrip.getHeadsignId());
 				return true;
 			}
 		}
 		throw new MTLog.Fatal("Unexpected trips to merge %s & %s!", mTrip, mTripToMerge);
 	}
-
-	private static final Pattern TOWARDS = Pattern.compile("((^|\\W){1}(towards)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern AVENIR_CENTER_ = CleanUtils.cleanWords("Avenir Centre Avenir");
 	private static final String AVENIR_CENTER_REPLACEMENT = CleanUtils.cleanWordsReplacement("Avenir Ctr");
@@ -334,45 +301,59 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final Pattern SOUTH_PLAZA_ = CleanUtils.cleanWords("south plaza sud");
 	private static final String SOUTH_PLAZA_REPLACEMENT = CleanUtils.cleanWordsReplacement("South Plz");
 
+	private static final Pattern COLISEUM_ = Pattern.compile("(coliseum - colisée)", Pattern.CASE_INSENSITIVE);
+	private static final String COLISEUM_REPLACEMENT = "Coliseum"; // FIXME support for head-sign string i18n
+
+	private static final Pattern HOSP_ = Pattern.compile("(hospitals - hôpitaux)", Pattern.CASE_INSENSITIVE);
+	private static final String HOSP_REPLACEMENT = "Hospitals"; // FIXME support for head-sign string i18n
+
+	private static final Pattern NORTH_ = Pattern.compile("(north / nord)", Pattern.CASE_INSENSITIVE);
+	private static final String NORTH_REPLACEMENT = "North"; // FIXME support for head-sign string i18n
+
+	private static final Pattern SOUTH_ = Pattern.compile("(south / sud)", Pattern.CASE_INSENSITIVE);
+	private static final String SOUTH_REPLACEMENT = "South"; // FIXME support for head-sign string i18n
+
+	private static final Pattern STARTS_W_SHUTTLE_FOR_ = Pattern.compile("(^shuttle for )", Pattern.CASE_INSENSITIVE);
+
+	@NotNull
 	@Override
-	public String cleanTripHeadsign(String tripHeadsign) {
-		Matcher matcherTOWARDS = TOWARDS.matcher(tripHeadsign);
-		if (matcherTOWARDS.find()) {
-			String gTripHeadsignAfterTOWARDS = tripHeadsign.substring(matcherTOWARDS.end());
-			tripHeadsign = gTripHeadsignAfterTOWARDS;
-		}
+	public String cleanTripHeadsign(@NotNull String tripHeadsign) {
 		tripHeadsign = AVENIR_CENTER_.matcher(tripHeadsign).replaceAll(AVENIR_CENTER_REPLACEMENT);
 		tripHeadsign = CF_CHAMPLAIN_.matcher(tripHeadsign).replaceAll(CF_CHAMPLAIN_REPLACEMENT);
 		tripHeadsign = NORTH_PLAZA_.matcher(tripHeadsign).replaceAll(NORTH_PLAZA_REPLACEMENT);
 		tripHeadsign = SOUTH_PLAZA_.matcher(tripHeadsign).replaceAll(SOUTH_PLAZA_REPLACEMENT);
+		tripHeadsign = COLISEUM_.matcher(tripHeadsign).replaceAll(COLISEUM_REPLACEMENT);
+		tripHeadsign = HOSP_.matcher(tripHeadsign).replaceAll(HOSP_REPLACEMENT);
+		tripHeadsign = NORTH_.matcher(tripHeadsign).replaceAll(NORTH_REPLACEMENT);
+		tripHeadsign = SOUTH_.matcher(tripHeadsign).replaceAll(SOUTH_REPLACEMENT);
+		tripHeadsign = STARTS_W_SHUTTLE_FOR_.matcher(tripHeadsign).replaceAll(EMPTY);
 		tripHeadsign = CleanUtils.CLEAN_AND.matcher(tripHeadsign).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
-		tripHeadsign = CleanUtils.removePoints(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
-	private static final Pattern UNIVERSITY_ENCODING = Pattern.compile("((^|\\W){1}(universit�)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String UNIVERSITY_ENCODING_REPLACEMENT = "$2University$4";
+	private static final Pattern UNIVERSITY_ENCODING = Pattern.compile("((^|\\W)(universit�)(\\W|$))", Pattern.CASE_INSENSITIVE);
+	private static final String UNIVERSITY_ENCODING_REPLACEMENT = "$2" + "University" + "$4";
 
-	private static final Pattern ADELARD_ENCODING = Pattern.compile("((^|\\W){1}(ad�lard)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String ADELARD_ENCODING_REPLACEMENT = "$2Adelard$4";
+	private static final Pattern ADELARD_ENCODING = Pattern.compile("((^|\\W)(ad�lard)(\\W|$))", Pattern.CASE_INSENSITIVE);
+	private static final String ADELARD_ENCODING_REPLACEMENT = "$2" + "Adelard" + "$4";
 
+	@NotNull
 	@Override
-	public String cleanStopName(String gStopName) {
+	public String cleanStopName(@NotNull String gStopName) {
 		gStopName = CleanUtils.CLEAN_AND.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AND_REPLACEMENT);
 		gStopName = CleanUtils.CLEAN_AT.matcher(gStopName).replaceAll(CleanUtils.CLEAN_AT_REPLACEMENT);
 		gStopName = UNIVERSITY_ENCODING.matcher(gStopName).replaceAll(UNIVERSITY_ENCODING_REPLACEMENT);
 		gStopName = ADELARD_ENCODING.matcher(gStopName).replaceAll(ADELARD_ENCODING_REPLACEMENT);
 		gStopName = CleanUtils.cleanSlashes(gStopName);
-		gStopName = CleanUtils.removePoints(gStopName);
 		gStopName = CleanUtils.cleanNumbers(gStopName);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
 	}
 
 	@Override
-	public int getStopId(GStop gStop) {
+	public int getStopId(@NotNull GStop gStop) {
 		String stopCode = gStop.getStopCode();
 		if (Utils.isDigitsOnly(stopCode)) {
 			return Integer.parseInt(stopCode);
