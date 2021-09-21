@@ -1,16 +1,18 @@
 package org.mtransit.parser.ca_moncton_codiac_transpo_bus;
 
+import static org.mtransit.commons.RegexUtils.DIGITS;
+import static org.mtransit.commons.StringUtils.EMPTY;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mtransit.commons.CharUtils;
 import org.mtransit.commons.CleanUtils;
-import org.mtransit.commons.StringUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.mt.data.MAgency;
-import org.mtransit.parser.mt.data.MRoute;
+import org.mtransit.parser.mt.data.MRouteSNToIDConverter;
 import org.mtransit.parser.mt.data.MTrip;
 
 import java.util.Arrays;
@@ -19,14 +21,18 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.mtransit.parser.StringUtils.EMPTY;
-
 // https://open.moncton.ca/datasets/transit-files-gtfs
 // https://www7.moncton.ca/opendata/google_transit.zip
 public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
 		new MonctonCodiacTranspoBusAgencyTools().start(args);
+	}
+
+	@Nullable
+	@Override
+	public List<Locale> getSupportedLanguages() {
+		return LANG_EN_FR;
 	}
 
 	@Override
@@ -46,27 +52,21 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return MAgency.ROUTE_TYPE_BUS;
 	}
 
-	private static final Pattern DIGITS = Pattern.compile("[\\d]+");
+	@Override
+	public boolean defaultRouteIdEnabled() {
+		return true;
+	}
 
-	private static final long RID_ENDS_WITH_A = 10_000L;
-	private static final long RID_ENDS_WITH_B = 20_000L;
-	private static final long RID_ENDS_WITH_C = 30_000L;
-	private static final long RID_ENDS_WITH_D = 40_000L;
-	private static final long RID_ENDS_WITH_P = 160_000L;
-	private static final long RID_ENDS_WITH_S = 190_000L;
-	//
-	private static final long RID_ENDS_WITH_C1 = 27L * 10_000L;
-	private static final long RID_ENDS_WITH_C2 = 28L * 10_000L;
-	private static final long RID_ENDS_WITH_LT = 29L * 10_000L;
-	private static final long RID_ENDS_WITH_LTS = 30L * 10_000L;
+	@Override
+	public boolean useRouteShortNameForRouteId() {
+		return true;
+	}
 
-	private static final String A = "a";
-	private static final String B = "b";
-	private static final String C = "c";
-	private static final String D = "d";
-	private static final String P = "p";
-	private static final String S = "s";
-	//
+	private static final long RID_ENDS_WITH_C1 = MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.other(0L));
+	private static final long RID_ENDS_WITH_C2 = MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.other(1L));
+	private static final long RID_ENDS_WITH_LT = MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.other(2L));
+	private static final long RID_ENDS_WITH_LTS = MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.other(3L));
+
 	private static final String C1 = "c1";
 	private static final String C2 = "c2";
 	private static final String LT = "lt";
@@ -78,48 +78,37 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 	private static final String MM_RID = "MM";
 	private static final String METS_RID = "METS";
 
+	@Nullable
 	@Override
-	public long getRouteId(@NotNull GRoute gRoute) {
-		final String rsn = gRoute.getRouteShortName().toLowerCase(Locale.ENGLISH);
-		if (CharUtils.isDigitsOnly(rsn)) {
-			return Long.parseLong(rsn); // use route short name as route ID
-		}
-		if (MM_RID.equalsIgnoreCase(rsn)) {
+	public Long convertRouteIdFromShortNameNotSupported(@NotNull String routeShortName) {
+		switch (routeShortName) {
+		case MM_RID:
 			return RID_MM;
-		} else if (METS_RID.equalsIgnoreCase(rsn)) {
+		case METS_RID:
 			return RID_METS;
 		}
-		final Matcher matcher = DIGITS.matcher(rsn);
-		if (matcher.find()) {
-			final long id = Long.parseLong(matcher.group());
-			if (rsn.endsWith(LTS)) {
-				return RID_ENDS_WITH_LTS + id;
-			} else if (rsn.endsWith(LT)) {
-				return RID_ENDS_WITH_LT + id;
-			} else if (rsn.endsWith(A)) {
-				return RID_ENDS_WITH_A + id;
-			} else if (rsn.endsWith(B)) {
-				return RID_ENDS_WITH_B + id;
-			} else if (rsn.endsWith(C)) {
-				return RID_ENDS_WITH_C + id;
-			} else if (rsn.endsWith(D)) {
-				return RID_ENDS_WITH_D + id;
-			} else if (rsn.endsWith(P)) {
-				return RID_ENDS_WITH_P + id;
-			} else if (rsn.endsWith(S)) {
-				return RID_ENDS_WITH_S + id;
-			} else if (rsn.endsWith(C1)) {
-				return RID_ENDS_WITH_C1 + id;
-			} else if (rsn.endsWith(C2)) {
-				return RID_ENDS_WITH_C2 + id;
-			}
+		return super.convertRouteIdFromShortNameNotSupported(routeShortName);
+	}
+
+	@Nullable
+	@Override
+	public Long convertRouteIdNextChars(@NotNull String nextChars) {
+		switch (nextChars) {
+		case LTS:
+			return RID_ENDS_WITH_LTS;
+		case LT:
+			return RID_ENDS_WITH_LT;
+		case C1:
+			return RID_ENDS_WITH_C1;
+		case C2:
+			return RID_ENDS_WITH_C2;
 		}
-		throw new MTLog.Fatal("Unexpected route ID for %s!", gRoute.toStringPlus());
+		return super.convertRouteIdNextChars(nextChars);
 	}
 
 	@Override
-	public boolean mergeRouteLongName(@NotNull MRoute mRoute, @NotNull MRoute mRouteToMerge) {
-		throw new MTLog.Fatal("Unexpected routes to merge %s & %s!", mRoute, mRouteToMerge);
+	public boolean defaultAgencyColorEnabled() {
+		return true;
 	}
 
 	private static final String AGENCY_COLOR_GREEN = "005238"; // GREEN (from PDF)
@@ -132,66 +121,68 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 		return AGENCY_COLOR;
 	}
 
+	@Override
+	public boolean defaultRouteLongNameEnabled() {
+		return true;
+	}
+
 	@Nullable
 	@Override
-	public String getRouteColor(@NotNull GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
-			final long routeId = getRouteId(gRoute);
-			switch ((int) routeId) {
-			// @formatter:off
-			case 50: return "ED1D24";
-			case 51: return "00A651";
-			case 52: return "0072BC";
-			case 60: return "E977AF";
-			case 61: return "684287";
-			case 62: return "DC62A4";
-			case 63: return "F7941E";
-			case 64: return "A6664C";
-			case 65: return "FBAF34";
-			case 66: return "65A6BB";
-			case 67: return "2E3092";
-			case 68: return "00AEEF";
-			case 70: return "3EC7F4";
-			case 71: return "8DC63F";
-			case 72: return "8DC63F";
-			case 73: return "6A3B0C";
-			case 75: return "732600";
-			case 80: return "CF8B2D";
-			case 81: return "942976";
-			case 82: return "FDCC08";
-			case 83: return "B63030";
-			case 93: return "8FB73E";
-			case 94: return "41827C";
-			case 95: return "F58473";
-			case 939495: return null; // agency color
-			// @formatter:on
-			}
-			if (RID_MM == routeId) { // MM
-				return null; // agency color
-			} else if (RID_METS == routeId) { // METS
-				return null; // agency color
-			} else if (60L + RID_ENDS_WITH_LT == routeId) {
-				return "E977AF"; // same as 60
-			} else if (60L + RID_ENDS_WITH_LTS == routeId) {
-				return "E977AF"; // same as 60
-			} else if (60_67L + RID_ENDS_WITH_C == routeId) { // 6067C
-				return null; // agency color
-			} else if (61L + RID_ENDS_WITH_B == routeId) { // 61B
-				return "B0A0C5";
-			} else if (6851L + RID_ENDS_WITH_D == routeId) { // 6851D
-				return null;
-			} else if (80_81L + RID_ENDS_WITH_C1 == routeId) { // 8081C1
-				return null; // agency color
-			} else if (80_81L + RID_ENDS_WITH_C2 == routeId) { // 8081C2
-				return null; // agency color
-			} else if (81L + RID_ENDS_WITH_S == routeId) { // 81S
-				return "942976"; // same as 81
-			} else if (93L + RID_ENDS_WITH_A == routeId) { // 93A
-				return "A94D3F"; // same as 93
-			}
-			throw new MTLog.Fatal("Unexpected route color for %s!", gRoute.toStringPlus());
+	public String provideMissingRouteColor(@NotNull GRoute gRoute) {
+		final long routeId = getRouteId(gRoute);
+		switch ((int) routeId) {
+		// @formatter:off
+		case 50: return "ED1D24";
+		case 51: return "00A651";
+		case 52: return "0072BC";
+		case 60: return "E977AF";
+		case 61: return "684287";
+		case 62: return "DC62A4";
+		case 63: return "F7941E";
+		case 64: return "A6664C";
+		case 65: return "FBAF34";
+		case 66: return "65A6BB";
+		case 67: return "2E3092";
+		case 68: return "00AEEF";
+		case 70: return "3EC7F4";
+		case 71: return "8DC63F";
+		case 72: return "8DC63F";
+		case 73: return "6A3B0C";
+		case 75: return "732600";
+		case 80: return "CF8B2D";
+		case 81: return "942976";
+		case 82: return "FDCC08";
+		case 83: return "B63030";
+		case 93: return "8FB73E";
+		case 94: return "41827C";
+		case 95: return "F58473";
+		case 939495: return null; // agency color
+		// @formatter:on
 		}
-		return super.getRouteColor(gRoute);
+		if (RID_MM == routeId) { // MM
+			return null; // agency color
+		} else if (RID_METS == routeId) { // METS
+			return null; // agency color
+		} else if (60L + RID_ENDS_WITH_LT == routeId) {
+			return "E977AF"; // same as 60
+		} else if (60L + RID_ENDS_WITH_LTS == routeId) {
+			return "E977AF"; // same as 60
+		} else if (60_67L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.C) == routeId) { // 6067C
+			return null; // agency color
+		} else if (61L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.B) == routeId) { // 61B
+			return "B0A0C5";
+		} else if (6851L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.D) == routeId) { // 6851D
+			return null;
+		} else if (80_81L + RID_ENDS_WITH_C1 == routeId) { // 8081C1
+			return null; // agency color
+		} else if (80_81L + RID_ENDS_WITH_C2 == routeId) { // 8081C2
+			return null; // agency color
+		} else if (81L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.S) == routeId) { // 81S
+			return "942976"; // same as 81
+		} else if (93L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.A) == routeId) { // 93A
+			return "A94D3F"; // same as 93
+		}
+		throw new MTLog.Fatal("Unexpected route color for %s!", gRoute.toStringPlus());
 	}
 
 	@Override
