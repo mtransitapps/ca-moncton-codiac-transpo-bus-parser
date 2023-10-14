@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mtransit.commons.CharUtils;
 import org.mtransit.commons.CleanUtils;
+import org.mtransit.commons.Letters;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
 import org.mtransit.parser.gtfs.data.GRoute;
@@ -22,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // https://open.moncton.ca/datasets/transit-files-gtfs
-// https://www7.moncton.ca/opendata/google_transit.zip
 public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
@@ -167,19 +167,19 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 			return "E977AF"; // same as 60
 		} else if (60L + RID_ENDS_WITH_LTS == routeId) {
 			return "E977AF"; // same as 60
-		} else if (60_67L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.C) == routeId) { // 6067C
+		} else if (60_67L + MRouteSNToIDConverter.endsWith(Letters.C) == routeId) { // 6067C
 			return null; // agency color
-		} else if (61L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.B) == routeId) { // 61B
+		} else if (61L + MRouteSNToIDConverter.endsWith(Letters.B) == routeId) { // 61B
 			return "B0A0C5";
-		} else if (6851L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.D) == routeId) { // 6851D
+		} else if (6851L + MRouteSNToIDConverter.endsWith(Letters.D) == routeId) { // 6851D
 			return null;
 		} else if (80_81L + RID_ENDS_WITH_C1 == routeId) { // 8081C1
 			return null; // agency color
 		} else if (80_81L + RID_ENDS_WITH_C2 == routeId) { // 8081C2
 			return null; // agency color
-		} else if (81L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.S) == routeId) { // 81S
+		} else if (81L + MRouteSNToIDConverter.endsWith(Letters.S) == routeId) { // 81S
 			return "942976"; // same as 81
-		} else if (93L + MRouteSNToIDConverter.endsWith(MRouteSNToIDConverter.A) == routeId) { // 93A
+		} else if (93L + MRouteSNToIDConverter.endsWith(Letters.A) == routeId) { // 93A
 			return "A94D3F"; // same as 93
 		}
 		throw new MTLog.Fatal("Unexpected route color for %s!", gRoute.toStringPlus());
@@ -201,8 +201,8 @@ public class MonctonCodiacTranspoBusAgencyTools extends DefaultAgencyTools {
 
 	@NotNull
 	@Override
-	public String cleanDirectionHeadsign(boolean fromStopName, @NotNull String directionHeadSign) {
-		directionHeadSign = super.cleanDirectionHeadsign(fromStopName, directionHeadSign);
+	public String cleanDirectionHeadsign(int directionId, boolean fromStopName, @NotNull String directionHeadSign) {
+		directionHeadSign = super.cleanDirectionHeadsign(directionId, fromStopName, directionHeadSign);
 		directionHeadSign = CleanUtils.cleanBounds(directionHeadSign); // only kept EN for now
 		return directionHeadSign;
 	}
